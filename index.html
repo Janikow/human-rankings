@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReflexZone — Human Benchmark & Training Platform</title>
+  <meta name="description" content="Test and train your reaction time, aim, memory, typing speed, and CPS. Track your progress and compete with gamers worldwide." />
+  <meta name="keywords" content="reaction time test, CPS test, aim trainer, memory test, typing speed test, human benchmark, reflex training" />
+  <meta property="og:title" content="ReflexZone — Human Benchmark Platform" />
+  <meta property="og:description" content="Test your reaction time, aim, memory, and more. Train daily, level up, climb the ranks." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- AD PLACEHOLDER: Top Banner -->
+  <div class="ad-banner ad-top" aria-label="Advertisement">
+    <span>AD SPACE — 728×90 LEADERBOARD</span>
+  </div>
+
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo" data-nav="home">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">REFLEX<span class="logo-accent">ZONE</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="#reaction-time" class="nav-link" data-nav="reaction">Reaction</a>
+        <a href="#cps-test" class="nav-link" data-nav="cps">CPS</a>
+        <a href="#aim-trainer" class="nav-link" data-nav="aim">Aim</a>
+        <a href="#memory-test" class="nav-link" data-nav="memory">Memory</a>
+        <a href="#typing-speed" class="nav-link" data-nav="typing">Typing</a>
+        <a href="#dashboard" class="nav-link nav-dashboard" data-nav="dashboard">
+          <span class="dash-icon">◈</span> Dashboard
+        </a>
+      </div>
+      <button class="nav-toggle" aria-label="Toggle menu" id="navToggle">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== MOBILE MENU ===== -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#reaction-time" class="mob-link" data-nav="reaction">⚡ Reaction Time</a>
+    <a href="#cps-test" class="mob-link" data-nav="cps">🖱 CPS Test</a>
+    <a href="#aim-trainer" class="mob-link" data-nav="aim">🎯 Aim Trainer</a>
+    <a href="#memory-test" class="mob-link" data-nav="memory">🧠 Memory Test</a>
+    <a href="#typing-speed" class="mob-link" data-nav="typing">⌨️ Typing Speed</a>
+    <a href="#dashboard" class="mob-link" data-nav="dashboard">◈ Dashboard</a>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main id="mainContent">
+
+    <!-- ===== HOME / LANDING ===== -->
+    <section id="home" class="section section-home active" aria-label="Home">
+      <div class="home-bg">
+        <div class="grid-overlay"></div>
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+      </div>
+      <div class="home-content">
+        <div class="home-badge">HUMAN BENCHMARK PLATFORM</div>
+        <h1 class="home-title">
+          TEST YOUR<br/>
+          <span class="title-accent">REFLEXES</span>
+        </h1>
+        <p class="home-subtitle">Train reaction time, aim, memory, typing, and more. Earn XP, level up, and dominate the leaderboard.</p>
+
+        <!-- Player HUD -->
+        <div class="player-hud">
+          <div class="hud-stat">
+            <span class="hud-label">LEVEL</span>
+            <span class="hud-value" id="hudLevel">1</span>
+          </div>
+          <div class="hud-xp-bar">
+            <div class="hud-xp-fill" id="hudXpFill" style="width:0%"></div>
+            <span class="hud-xp-text" id="hudXpText">0 / 100 XP</span>
+          </div>
+          <div class="hud-stat">
+            <span class="hud-label">STREAK</span>
+            <span class="hud-value streak-val" id="hudStreak">0🔥</span>
+          </div>
+        </div>
+
+        <!-- Test Cards Grid -->
+        <div class="test-grid">
+          <a href="#reaction-time" class="test-card" data-nav="reaction">
+            <div class="card-icon">⚡</div>
+            <div class="card-info">
+              <h3>Reaction Time</h3>
+              <p>Test your visual reflexes</p>
+            </div>
+            <div class="card-best" id="homeReactionBest">— ms</div>
+          </a>
+          <a href="#cps-test" class="test-card" data-nav="cps">
+            <div class="card-icon">🖱</div>
+            <div class="card-info">
+              <h3>CPS Test</h3>
+              <p>Clicks per second</p>
+            </div>
+            <div class="card-best" id="homeCpsBest">— CPS</div>
+          </a>
+          <a href="#aim-trainer" class="test-card" data-nav="aim">
+            <div class="card-icon">🎯</div>
+            <div class="card-info">
+              <h3>Aim Trainer</h3>
+              <p>Track & destroy targets</p>
+            </div>
+            <div class="card-best" id="homeAimBest">— pts</div>
+          </a>
+          <a href="#memory-test" class="test-card" data-nav="memory">
+            <div class="card-icon">🧠</div>
+            <div class="card-info">
+              <h3>Memory Test</h3>
+              <p>Sequence recall</p>
+            </div>
+            <div class="card-best" id="homeMemoryBest">Level —</div>
+          </a>
+          <a href="#typing-speed" class="test-card" data-nav="typing">
+            <div class="card-icon">⌨️</div>
+            <div class="card-info">
+              <h3>Typing Speed</h3>
+              <p>WPM & accuracy</p>
+            </div>
+            <div class="card-best" id="homeTypingBest">— WPM</div>
+          </a>
+          <a href="#dashboard" class="test-card card-dashboard" data-nav="dashboard">
+            <div class="card-icon">◈</div>
+            <div class="card-info">
+              <h3>Dashboard</h3>
+              <p>Stats & history</p>
+            </div>
+            <div class="card-best">View All</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== REACTION TIME TEST ===== -->
+    <section id="reaction-time" class="section" aria-label="Reaction Time Test">
+      <div class="section-header">
+        <div class="sec-back" data-nav="home">← Back</div>
+        <div class="sec-title-block">
+          <h2>⚡ Reaction Time</h2>
+          <p>When the screen flashes — click as fast as possible. Tests visual reflexes.</p>
+        </div>
+        <div class="sec-controls">
+          <select id="reactionMode" class="mode-select">
+            <option value="normal">Normal</option>
+            <option value="training">Training Mode</option>
+          </select>
+          <select id="reactionDifficulty" class="mode-select">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- AD PLACEHOLDER: Between test rounds -->
+      <div class="ad-inline ad-reaction" aria-label="Advertisement"><span>AD — 320×50</span></div>
+
+      <div class="reaction-arena" id="reactionArena">
+        <div class="reaction-state waiting" id="reactionState">
+          <div class="react-icon">⚡</div>
+          <div class="react-msg" id="reactMsg">Click to Start</div>
+          <div class="react-sub" id="reactSub">Wait for the screen to flash green</div>
+          <div class="react-rounds" id="reactRounds">Round 1 / 5</div>
+        </div>
+      </div>
+
+      <div class="reaction-results hidden" id="reactionResults">
+        <div class="result-card">
+          <div class="result-time" id="reactionTime">—</div>
+          <div class="result-label">milliseconds</div>
+          <div class="result-rating" id="reactionRating">—</div>
+          <div class="rounds-display" id="roundsDisplay"></div>
+          <div class="result-avg" id="reactionAvg"></div>
+          <div class="result-actions">
+            <button class="btn-primary" id="reactionRetry">Try Again</button>
+            <button class="btn-secondary" id="reactionShare">📋 Share Result</button>
+          </div>
+          <div class="share-box hidden" id="reactionShareBox">
+            <input type="text" class="share-input" id="reactionShareText" readonly />
+            <button class="btn-copy" id="reactionCopyBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-info">
+        <h3>About Reaction Time</h3>
+        <p>Average human reaction time is 200–250ms. Elite gamers often hit 150–180ms. Pro athletes can reach 120ms. Regular training can improve your baseline significantly.</p>
+      </div>
+    </section>
+
+    <!-- ===== CPS TEST ===== -->
+    <section id="cps-test" class="section" aria-label="CPS Test">
+      <div class="section-header">
+        <div class="sec-back" data-nav="home">← Back</div>
+        <div class="sec-title-block">
+          <h2>🖱 CPS Test</h2>
+          <p>Click as fast as you can. Tests raw click speed — essential for gaming.</p>
+        </div>
+        <div class="sec-controls">
+          <select id="cpsDuration" class="mode-select">
+            <option value="5">5 Seconds</option>
+            <option value="10">10 Seconds</option>
+            <option value="1">1 Second</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="cps-arena" id="cpsArena">
+        <div class="cps-display">
+          <div class="cps-timer-ring">
+            <svg viewBox="0 0 120 120" class="ring-svg">
+              <circle cx="60" cy="60" r="54" class="ring-bg"/>
+              <circle cx="60" cy="60" r="54" class="ring-fill" id="cpsRingFill"/>
+            </svg>
+            <div class="ring-inner">
+              <div class="cps-number" id="cpsNumber">0.00</div>
+              <div class="cps-label">CPS</div>
+            </div>
+          </div>
+          <div class="cps-meta">
+            <div class="cps-stat"><span id="cpsClickCount">0</span><small>Clicks</small></div>
+            <div class="cps-stat"><span id="cpsTimeLeft">5.0</span><small>Seconds</small></div>
+          </div>
+        </div>
+        <button class="cps-btn" id="cpsBtn">
+          <span id="cpsBtnText">CLICK TO START</span>
+          <div class="cps-ripple" id="cpsRipple"></div>
+        </button>
+      </div>
+
+      <div class="cps-results hidden" id="cpsResults">
+        <div class="result-card">
+          <div class="result-time" id="cpsFinalScore">—</div>
+          <div class="result-label">clicks per second</div>
+          <div class="result-rating" id="cpsRating">—</div>
+          <div class="result-sub" id="cpsTotalClicks">— total clicks</div>
+          <div class="result-actions">
+            <button class="btn-primary" id="cpsRetry">Try Again</button>
+            <button class="btn-secondary" id="cpsShare">📋 Share</button>
+          </div>
+          <div class="share-box hidden" id="cpsShareBox">
+            <input type="text" class="share-input" id="cpsShareText" readonly />
+            <button class="btn-copy" id="cpsCopyBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-info">
+        <h3>About CPS (Clicks Per Second)</h3>
+        <p>Average players click 5–8 CPS. Jitter clicking can reach 14–16 CPS. Butterfly clicking can exceed 20 CPS. Fast clicking is crucial in PvP games like Minecraft.</p>
+      </div>
+    </section>
+
+    <!-- ===== AIM TRAINER ===== -->
+    <section id="aim-trainer" class="section" aria-label="Aim Trainer">
+      <div class="section-header">
+        <div class="sec-back" data-nav="home">← Back</div>
+        <div class="sec-title-block">
+          <h2>🎯 Aim Trainer</h2>
+          <p>Hit targets as fast and accurately as possible. Difficulty increases over time.</p>
+        </div>
+        <div class="sec-controls">
+          <select id="aimDifficulty" class="mode-select">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+            <option value="insane">Insane</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="aim-hud" id="aimHud">
+        <div class="aim-stat"><span id="aimScore">0</span><small>Score</small></div>
+        <div class="aim-stat"><span id="aimTime">30</span><small>Time</small></div>
+        <div class="aim-stat"><span id="aimAccuracy">—</span><small>Accuracy</small></div>
+        <div class="aim-stat"><span id="aimHits">0</span><small>Hits</small></div>
+      </div>
+
+      <div class="aim-arena" id="aimArena">
+        <div class="aim-start-overlay" id="aimStartOverlay">
+          <div class="aim-start-icon">🎯</div>
+          <div class="aim-start-title">Aim Trainer</div>
+          <div class="aim-start-sub">Click targets as fast as possible<br/>30 seconds, difficulty ramps up</div>
+          <button class="btn-primary btn-large" id="aimStartBtn">Start Training</button>
+        </div>
+      </div>
+
+      <div class="aim-results hidden" id="aimResults">
+        <div class="result-card">
+          <div class="result-time" id="aimFinalScore">—</div>
+          <div class="result-label">score</div>
+          <div class="result-rating" id="aimRating">—</div>
+          <div class="aim-result-stats">
+            <div class="mini-stat"><span id="aimResHits">—</span><small>Hits</small></div>
+            <div class="mini-stat"><span id="aimResMisses">—</span><small>Misses</small></div>
+            <div class="mini-stat"><span id="aimResAccuracy">—</span><small>Accuracy</small></div>
+            <div class="mini-stat"><span id="aimResAvgTime">—</span><small>Avg Time</small></div>
+          </div>
+          <div class="result-actions">
+            <button class="btn-primary" id="aimRetry">Train Again</button>
+            <button class="btn-secondary" id="aimShare">📋 Share</button>
+          </div>
+          <div class="share-box hidden" id="aimShareBox">
+            <input type="text" class="share-input" id="aimShareText" readonly />
+            <button class="btn-copy" id="aimCopyBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-info">
+        <h3>About Aim Training</h3>
+        <p>Consistent aim training improves muscle memory and target tracking. Even 10 minutes daily leads to measurable improvement in FPS games within 2 weeks.</p>
+      </div>
+    </section>
+
+    <!-- ===== MEMORY TEST ===== -->
+    <section id="memory-test" class="section" aria-label="Memory Test">
+      <div class="section-header">
+        <div class="sec-back" data-nav="home">← Back</div>
+        <div class="sec-title-block">
+          <h2>🧠 Memory Test</h2>
+          <p>Watch the tile sequence, then repeat it. Each round adds one more tile.</p>
+        </div>
+      </div>
+
+      <div class="memory-status" id="memoryStatus">
+        <div class="mem-stat"><span id="memLevel">1</span><small>Level</small></div>
+        <div class="mem-stat"><span id="memBest">0</span><small>Best</small></div>
+        <div class="mem-msg" id="memMsg">Watch the sequence...</div>
+      </div>
+
+      <div class="memory-grid" id="memoryGrid">
+        <!-- 3×3 grid of tiles, generated by JS -->
+      </div>
+
+      <div class="memory-controls" id="memoryControls">
+        <button class="btn-primary" id="memStartBtn">Start Game</button>
+      </div>
+
+      <div class="memory-results hidden" id="memoryResults">
+        <div class="result-card">
+          <div class="result-time" id="memFinalLevel">—</div>
+          <div class="result-label">level reached</div>
+          <div class="result-rating" id="memRating">—</div>
+          <div class="result-actions">
+            <button class="btn-primary" id="memRetry">Play Again</button>
+            <button class="btn-secondary" id="memShare">📋 Share</button>
+          </div>
+          <div class="share-box hidden" id="memShareBox">
+            <input type="text" class="share-input" id="memShareText" readonly />
+            <button class="btn-copy" id="memCopyBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-info">
+        <h3>About Memory Training</h3>
+        <p>Sequence memory tests working memory capacity. Average adults remember 5–9 items. Regular training expands capacity. Essential for tracking multiple elements in competitive games.</p>
+      </div>
+    </section>
+
+    <!-- ===== TYPING SPEED ===== -->
+    <section id="typing-speed" class="section" aria-label="Typing Speed Test">
+      <div class="section-header">
+        <div class="sec-back" data-nav="home">← Back</div>
+        <div class="sec-title-block">
+          <h2>⌨️ Typing Speed</h2>
+          <p>Type the paragraph below as fast and accurately as possible.</p>
+        </div>
+        <div class="sec-controls">
+          <select id="typingDuration" class="mode-select">
+            <option value="30">30 Seconds</option>
+            <option value="60" selected>60 Seconds</option>
+            <option value="120">2 Minutes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="typing-hud" id="typingHud">
+        <div class="type-stat"><span id="typeWpm">0</span><small>WPM</small></div>
+        <div class="type-stat"><span id="typeAccuracy">100%</span><small>Accuracy</small></div>
+        <div class="type-stat"><span id="typeTimer">60</span><small>Seconds</small></div>
+        <div class="type-stat"><span id="typeErrors">0</span><small>Errors</small></div>
+      </div>
+
+      <div class="typing-area" id="typingArea">
+        <div class="type-prompt" id="typePrompt"></div>
+        <input type="text" class="type-input" id="typeInput" placeholder="Click here and start typing..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      </div>
+
+      <div class="typing-results hidden" id="typingResults">
+        <div class="result-card">
+          <div class="result-time" id="typeFinalWpm">—</div>
+          <div class="result-label">words per minute</div>
+          <div class="result-rating" id="typeRating">—</div>
+          <div class="aim-result-stats">
+            <div class="mini-stat"><span id="typeResAccuracy">—</span><small>Accuracy</small></div>
+            <div class="mini-stat"><span id="typeResWords">—</span><small>Words</small></div>
+            <div class="mini-stat"><span id="typeResChars">—</span><small>Chars</small></div>
+            <div class="mini-stat"><span id="typeResErrors">—</span><small>Errors</small></div>
+          </div>
+          <div class="result-actions">
+            <button class="btn-primary" id="typeRetry">Type Again</button>
+            <button class="btn-secondary" id="typeShare">📋 Share</button>
+          </div>
+          <div class="share-box hidden" id="typeShareBox">
+            <input type="text" class="share-input" id="typeShareText" readonly />
+            <button class="btn-copy" id="typeCopyBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-info">
+        <h3>About Typing Speed</h3>
+        <p>Average typist: 40–60 WPM. Professional typists: 70–100 WPM. Top competitive typists exceed 150 WPM. Fast typing reduces friction in all digital work.</p>
+      </div>
+    </section>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section id="dashboard" class="section" aria-label="Stats Dashboard">
+      <div class="section-header">
+        <div class="sec-back" data-nav="home">← Back</div>
+        <div class="sec-title-block">
+          <h2>◈ Your Dashboard</h2>
+          <p>Track your progress, history, and personal bests.</p>
+        </div>
+        <button class="btn-danger-sm" id="resetAllData">Reset All Data</button>
+      </div>
+
+      <!-- XP / Level Card -->
+      <div class="dash-level-card">
+        <div class="dash-level-info">
+          <div class="dash-level-num" id="dashLevel">1</div>
+          <div class="dash-level-label">LEVEL</div>
+        </div>
+        <div class="dash-xp-section">
+          <div class="dash-xp-label">XP Progress</div>
+          <div class="dash-xp-bar">
+            <div class="dash-xp-fill" id="dashXpFill"></div>
+          </div>
+          <div class="dash-xp-nums" id="dashXpNums">0 / 100 XP</div>
+        </div>
+        <div class="dash-streak-info">
+          <div class="dash-streak-num" id="dashStreak">0</div>
+          <div class="dash-streak-label">🔥 STREAK</div>
+        </div>
+      </div>
+
+      <!-- AD PLACEHOLDER: Dashboard ad -->
+      <div class="ad-inline" aria-label="Advertisement"><span>AD SPACE — 728×90</span></div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card" id="dashReaction">
+          <div class="stat-icon">⚡</div>
+          <h4>Reaction Time</h4>
+          <div class="stat-best" id="dashReactionBest">— ms</div>
+          <div class="stat-avg" id="dashReactionAvg">Avg: — ms</div>
+          <div class="stat-history" id="dashReactionHistory"></div>
+        </div>
+        <div class="stat-card" id="dashCps">
+          <div class="stat-icon">🖱</div>
+          <h4>CPS Test</h4>
+          <div class="stat-best" id="dashCpsBest">— CPS</div>
+          <div class="stat-avg" id="dashCpsAvg">Avg: — CPS</div>
+          <div class="stat-history" id="dashCpsHistory"></div>
+        </div>
+        <div class="stat-card" id="dashAim">
+          <div class="stat-icon">🎯</div>
+          <h4>Aim Trainer</h4>
+          <div class="stat-best" id="dashAimBest">— pts</div>
+          <div class="stat-avg" id="dashAimAvg">Avg: — pts</div>
+          <div class="stat-history" id="dashAimHistory"></div>
+        </div>
+        <div class="stat-card" id="dashMemory">
+          <div class="stat-icon">🧠</div>
+          <h4>Memory Test</h4>
+          <div class="stat-best" id="dashMemoryBest">Level —</div>
+          <div class="stat-avg" id="dashMemoryAvg">Avg: Level —</div>
+          <div class="stat-history" id="dashMemoryHistory"></div>
+        </div>
+        <div class="stat-card" id="dashTyping">
+          <div class="stat-icon">⌨️</div>
+          <h4>Typing Speed</h4>
+          <div class="stat-best" id="dashTypingBest">— WPM</div>
+          <div class="stat-avg" id="dashTypingAvg">Avg: — WPM</div>
+          <div class="stat-history" id="dashTypingHistory"></div>
+        </div>
+        <div class="stat-card stat-total">
+          <div class="stat-icon">🏆</div>
+          <h4>Total XP Earned</h4>
+          <div class="stat-best" id="dashTotalXp">0 XP</div>
+          <div class="stat-avg" id="dashTestCount">0 tests completed</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- ===== LEVEL UP OVERLAY ===== -->
+  <div class="levelup-overlay hidden" id="levelupOverlay">
+    <div class="levelup-card">
+      <div class="levelup-icon">🏆</div>
+      <div class="levelup-title">LEVEL UP!</div>
+      <div class="levelup-num" id="levelupNum">2</div>
+      <div class="levelup-sub">Keep grinding to reach the next level</div>
+      <button class="btn-primary" id="levelupClose">Continue</button>
+    </div>
+  </div>
+
+  <!-- ===== AD PLACEHOLDER: Bottom Banner ===== -->
+  <div class="ad-banner ad-bottom" aria-label="Advertisement">
+    <span>AD SPACE — 728×90 LEADERBOARD</span>
+  </div>
+
+  <footer class="site-footer">
+    <p>⚡ ReflexZone — Human Benchmark & Training Platform</p>
+    <p><small>All tests run locally in your browser. No data sent to any server.</small></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
