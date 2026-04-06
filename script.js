@@ -1,6 +1,6 @@
 /* ============================================================
    REFLEXZONE — HUMAN BENCHMARK PLATFORM
-   script.js — Full Application Logic
+   script.js — Full Application Logic (Enhanced)
    ============================================================ */
 
 'use strict';
@@ -18,18 +18,223 @@ const REACTION_DELAY = {
   hard:   { min: 600,  max: 5000 }
 };
 
-const TYPING_PARAGRAPHS = [
-  "The quick brown fox jumps over the lazy dog near the riverbank where children play every afternoon during the long summer months.",
-  "Gaming requires split-second decisions and precise muscle memory built through thousands of hours of deliberate practice and reflection.",
-  "Reaction time is the interval between a stimulus and the initiation of a response. Elite athletes train this skill daily.",
-  "Speed and accuracy must work together. A fast typist who makes many errors is slower than a careful one who rarely backtracks.",
-  "The human brain can process a visual signal in as little as 100 milliseconds, but translating that into action takes longer.",
-  "Competitive gaming demands consistent performance under pressure. Mental training is just as important as mechanical skill.",
-  "Every millisecond counts when you are at the top of the leaderboard. Train smart, rest well, and compete with focus.",
-  "Aim trainers help build muscle memory for mouse control. Just fifteen minutes of daily practice shows results within two weeks.",
-  "Working memory determines how much information you can hold and manipulate at once. It is trainable with the right exercises.",
-  "Discipline beats motivation every time. Show up every day, track your progress, and the improvements will come inevitably."
-];
+/* ============================================================
+   WORD BANKS FOR TYPING TEST
+   ============================================================ */
+
+const WORD_BANKS = {
+  words: [
+    // Common 200 words
+    "the","be","to","of","and","a","in","that","have","it","for","not","on","with","he","as","you",
+    "do","at","this","but","his","by","from","they","we","say","her","she","or","an","will","my",
+    "one","all","would","there","their","what","so","up","out","if","about","who","get","which",
+    "go","me","when","make","can","like","time","no","just","him","know","take","people","into",
+    "year","your","good","some","could","them","see","other","than","then","now","look","only","come",
+    "its","over","think","also","back","after","use","two","how","our","work","first","well","way",
+    "even","new","want","because","any","these","give","day","most","us","great","between","need",
+    "large","often","hand","high","place","hold","turn","here","why","ask","went","men","read","need",
+    "land","different","home","move","try","kind","hand","picture","again","change","off","play","spell",
+    "air","away","animal","house","point","page","letter","mother","answer","found","study","still",
+    "learn","plant","cover","food","sun","four","between","state","keep","eye","never","last","let",
+    "thought","city","tree","cross","farm","hard","start","might","story","saw","far","sea","draw",
+    "left","late","run","don","while","press","close","night","real","life","few","north","open",
+    "seem","together","next","white","children","begin","got","walk","example","ease","paper","group",
+    "always","music","those","both","mark","book","carry","took","science","eat","room","friend","began",
+    "idea","fish","mountain","stop","once","base","hear","horse","cut","sure","watch","color","face",
+    "wood","main","enough","plain","girl","usual","young","ready","above","ever","red","list","though",
+    "feel","talk","bird","soon","body","dog","family","direct","pose","leave","song","measure","door",
+    "product","black","short","numeral","class","wind","question","happen","complete","ship","area"
+  ],
+  sentences: [
+    "The quick brown fox jumps over the lazy dog near the riverbank where children play every afternoon.",
+    "Gaming requires split-second decisions and precise muscle memory built through thousands of hours of deliberate practice.",
+    "Reaction time is the interval between a stimulus and the initiation of a response that follows.",
+    "Speed and accuracy must work together because a fast typist who makes many errors is slower overall.",
+    "The human brain can process a visual signal in as little as one hundred milliseconds after seeing it.",
+    "Competitive gaming demands consistent performance under pressure and mental training is just as important as mechanical skill.",
+    "Every millisecond counts when you are at the top of the leaderboard so train smart and rest well.",
+    "Aim trainers help build muscle memory for mouse control and just fifteen minutes of daily practice shows results.",
+    "Working memory determines how much information you can hold and manipulate at once and it is trainable.",
+    "Discipline beats motivation every time so show up every day track your progress and the improvements will come.",
+    "The best way to improve your typing speed is to focus on accuracy first and let speed follow.",
+    "Consistent practice leads to mastery in any skill whether it is typing gaming or playing an instrument.",
+    "Scientists have discovered that the human brain continues to form new neural connections throughout adult life with practice.",
+    "Professional esports players spend hours each day warming up their reflexes before competing in tournaments around the world.",
+    "The difference between an average player and a professional often comes down to hundreds of hours of focused training.",
+    "Memory is not fixed and can be improved through deliberate mental exercises and a healthy lifestyle with good sleep."
+  ],
+  numbers: [
+    "1 2 3 4 5 6 7 8 9 0",
+    "10 20 30 40 50 60 70 80 90 100",
+    "42 17 83 56 29 74 11 95 38 62",
+    "100 200 300 400 500 600 700 800 900 1000",
+    "3 14 159 265 358 979 323 846 264 338",
+    "2 71 828 182 845 904 523 536 028 747",
+    "7 11 13 17 19 23 29 31 37 41 43 47",
+    "1 1 2 3 5 8 13 21 34 55 89 144 233"
+  ],
+  code: [
+    "const x = 42; let y = x * 2; return y;",
+    "function add(a, b) { return a + b; }",
+    "if (score > 100) { level++; xp += 50; }",
+    "arr.map(x => x * 2).filter(x => x > 10)",
+    "import { useState } from 'react';",
+    "for (let i = 0; i < arr.length; i++) {}",
+    "const obj = { key: 'value', num: 42 };",
+    "document.querySelector('#id').classList.add('active');",
+    "async function fetch() { const res = await api(); }",
+    "export default class Component extends Base {}"
+  ]
+};
+
+/* ============================================================
+   THEME SYSTEM
+   ============================================================ */
+
+const THEMES = {
+  cyber: {
+    '--bg-base': '#080c12',
+    '--bg-card': '#0d1117',
+    '--bg-card2': '#111820',
+    '--bg-hover': '#1a2233',
+    '--border': 'rgba(255,255,255,0.07)',
+    '--border-glow': 'rgba(0,255,170,0.3)',
+    '--accent': '#00ffaa',
+    '--accent2': '#00c8ff',
+    '--accent3': '#ff6b35',
+    '--accent4': '#a855f7',
+    '--accent-dim': 'rgba(0,255,170,0.15)',
+    '--text-primary': '#e8edf5',
+    '--text-secondary': '#7a8a9e',
+    '--text-muted': '#4a5568',
+    '--orb1': 'rgba(0,255,170,0.06)',
+    '--orb2': 'rgba(0,200,255,0.04)',
+    '--orb3': 'rgba(168,85,247,0.04)'
+  },
+  neon: {
+    '--bg-base': '#0f0818',
+    '--bg-card': '#160d22',
+    '--bg-card2': '#1c1230',
+    '--bg-hover': '#251640',
+    '--border': 'rgba(255,100,255,0.1)',
+    '--border-glow': 'rgba(255,80,220,0.4)',
+    '--accent': '#ff50dc',
+    '--accent2': '#ff9cf7',
+    '--accent3': '#ffcc00',
+    '--accent4': '#00eeff',
+    '--accent-dim': 'rgba(255,80,220,0.15)',
+    '--text-primary': '#f5e8ff',
+    '--text-secondary': '#9a7aae',
+    '--text-muted': '#5a3a6e',
+    '--orb1': 'rgba(255,80,220,0.07)',
+    '--orb2': 'rgba(0,238,255,0.04)',
+    '--orb3': 'rgba(255,200,0,0.04)'
+  },
+  ocean: {
+    '--bg-base': '#020d1a',
+    '--bg-card': '#051525',
+    '--bg-card2': '#081e35',
+    '--bg-hover': '#0d2a4a',
+    '--border': 'rgba(0,180,255,0.1)',
+    '--border-glow': 'rgba(0,200,255,0.4)',
+    '--accent': '#00d4ff',
+    '--accent2': '#0080ff',
+    '--accent3': '#ff6b35',
+    '--accent4': '#00ffcc',
+    '--accent-dim': 'rgba(0,212,255,0.15)',
+    '--text-primary': '#d0eeff',
+    '--text-secondary': '#5a8aaa',
+    '--text-muted': '#2a4a6a',
+    '--orb1': 'rgba(0,212,255,0.06)',
+    '--orb2': 'rgba(0,100,255,0.05)',
+    '--orb3': 'rgba(0,255,180,0.04)'
+  },
+  fire: {
+    '--bg-base': '#120800',
+    '--bg-card': '#1a0d00',
+    '--bg-card2': '#221200',
+    '--bg-hover': '#2e1800',
+    '--border': 'rgba(255,120,0,0.1)',
+    '--border-glow': 'rgba(255,100,0,0.4)',
+    '--accent': '#ff6a00',
+    '--accent2': '#ffcc00',
+    '--accent3': '#ff2a2a',
+    '--accent4': '#ff9500',
+    '--accent-dim': 'rgba(255,106,0,0.15)',
+    '--text-primary': '#fff0e0',
+    '--text-secondary': '#aa7040',
+    '--text-muted': '#5a3010',
+    '--orb1': 'rgba(255,106,0,0.07)',
+    '--orb2': 'rgba(255,200,0,0.05)',
+    '--orb3': 'rgba(255,42,42,0.04)'
+  },
+  void: {
+    '--bg-base': '#07050f',
+    '--bg-card': '#0e0b1a',
+    '--bg-card2': '#14102a',
+    '--bg-hover': '#1e1840',
+    '--border': 'rgba(150,100,255,0.1)',
+    '--border-glow': 'rgba(130,80,255,0.4)',
+    '--accent': '#9060ff',
+    '--accent2': '#cc80ff',
+    '--accent3': '#ff4fa0',
+    '--accent4': '#60d0ff',
+    '--accent-dim': 'rgba(144,96,255,0.15)',
+    '--text-primary': '#e8e0ff',
+    '--text-secondary': '#7060aa',
+    '--text-muted': '#40306a',
+    '--orb1': 'rgba(144,96,255,0.07)',
+    '--orb2': 'rgba(204,128,255,0.05)',
+    '--orb3': 'rgba(255,79,160,0.04)'
+  },
+  light: {
+    '--bg-base': '#f0f4f8',
+    '--bg-card': '#ffffff',
+    '--bg-card2': '#f8fafc',
+    '--bg-hover': '#e8f0f8',
+    '--border': 'rgba(0,0,0,0.08)',
+    '--border-glow': 'rgba(0,120,255,0.3)',
+    '--accent': '#0070f3',
+    '--accent2': '#00aaff',
+    '--accent3': '#ff4500',
+    '--accent4': '#8800ff',
+    '--accent-dim': 'rgba(0,112,243,0.1)',
+    '--text-primary': '#0a0e1a',
+    '--text-secondary': '#4a5568',
+    '--text-muted': '#8a9aae',
+    '--orb1': 'rgba(0,112,243,0.06)',
+    '--orb2': 'rgba(0,170,255,0.04)',
+    '--orb3': 'rgba(136,0,255,0.04)'
+  }
+};
+
+function applyTheme(themeName) {
+  const theme = THEMES[themeName];
+  if (!theme) return;
+  const root = document.documentElement;
+  Object.entries(theme).forEach(([key, val]) => root.style.setProperty(key, val));
+  // Update orb colors
+  const orb1 = document.querySelector('.orb-1');
+  const orb2 = document.querySelector('.orb-2');
+  const orb3 = document.querySelector('.orb-3');
+  if (orb1) orb1.style.background = theme['--orb1'];
+  if (orb2) orb2.style.background = theme['--orb2'];
+  if (orb3) orb3.style.background = theme['--orb3'];
+
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeName}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  Storage.set('theme', themeName);
+}
+
+function initThemes() {
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+  });
+  const saved = Storage.get('theme', 'cyber');
+  applyTheme(saved);
+}
 
 /* ============================================================
    STORAGE — localStorage helpers
@@ -45,13 +250,11 @@ const Storage = {
   set(key, val) {
     try { localStorage.setItem('rz_' + key, JSON.stringify(val)); } catch {}
   },
-  // Add a score to a test's history (max MAX_HISTORY entries)
   addHistory(test, score) {
     const hist = this.get(test + '_hist', []);
     hist.unshift({ score, ts: Date.now() });
     if (hist.length > MAX_HISTORY) hist.pop();
     this.set(test + '_hist', hist);
-    // Update personal best
     const best = this.get(test + '_best', null);
     const isBetter = test === 'reaction'
       ? (best === null || score < best)
@@ -83,9 +286,7 @@ const XPSystem = {
     const newXP = this.getXP() + amount;
     Storage.set('xp', newXP);
     const newLevel = this.getLevel();
-    if (newLevel > prevLevel) {
-      showLevelUp(newLevel);
-    }
+    if (newLevel > prevLevel) showLevelUp(newLevel);
     updateHUD();
     return amount;
   }
@@ -123,16 +324,12 @@ function navigateTo(sectionId) {
     target.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  // Update nav link active states
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  // Close mobile menu
   document.getElementById('mobileMenu').classList.remove('open');
   document.getElementById('navToggle').classList.remove('open');
-  // Update home cards with latest bests
   updateHomeBests();
 }
 
-// Section ID map
 const NAV_MAP = {
   home: 'home',
   reaction: 'reaction-time',
@@ -140,11 +337,13 @@ const NAV_MAP = {
   aim: 'aim-trainer',
   memory: 'memory-test',
   typing: 'typing-speed',
+  number: 'number-memory',
+  chimp: 'chimp-test',
+  color: 'color-reflex',
   dashboard: 'dashboard'
 };
 
 function initNavigation() {
-  // All elements with data-nav attribute
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-nav]');
     if (!el) return;
@@ -152,18 +351,15 @@ function initNavigation() {
     const nav = el.dataset.nav;
     const sectionId = NAV_MAP[nav] || nav;
     navigateTo(sectionId);
-    // If navigating to dashboard, refresh it
     if (nav === 'dashboard') refreshDashboard();
   });
 
-  // Hash-based navigation on load
   const hash = window.location.hash.replace('#', '');
   if (hash && document.getElementById(hash)) {
     navigateTo(hash);
     if (hash === 'dashboard') refreshDashboard();
   }
 
-  // Mobile toggle
   document.getElementById('navToggle').addEventListener('click', () => {
     document.getElementById('mobileMenu').classList.toggle('open');
     document.getElementById('navToggle').classList.toggle('open');
@@ -184,22 +380,10 @@ function updateHUD() {
     ? Math.min(100, ((xp - xpThis) / (xpNext - xpThis)) * 100)
     : 100;
 
-  ['hudLevel', 'dashLevel'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = level;
-  });
-  ['hudStreak'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = streak + '🔥';
-  });
-  ['dashStreak'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = streak;
-  });
-  ['hudXpFill', 'dashXpFill'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.width = xpPercent + '%';
-  });
+  ['hudLevel', 'dashLevel'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = level; });
+  ['hudStreak'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = streak + '🔥'; });
+  ['dashStreak'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = streak; });
+  ['hudXpFill', 'dashXpFill'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = xpPercent + '%'; });
   const hudXpText = document.getElementById('hudXpText');
   if (hudXpText) hudXpText.textContent = `${xp - xpThis} / ${xpNext - xpThis} XP`;
   const dashXpNums = document.getElementById('dashXpNums');
@@ -212,12 +396,18 @@ function updateHomeBests() {
   const aimBest = Storage.get('aim_best', null);
   const memBest = Storage.get('memory_best', null);
   const typeBest = Storage.get('typing_best', null);
+  const numBest = Storage.get('number_best', null);
+  const chimpBest = Storage.get('chimp_best', null);
+  const colorBest = Storage.get('color_best', null);
 
   setEl('homeReactionBest', reactionBest !== null ? reactionBest + 'ms' : '— ms');
   setEl('homeCpsBest', cpsBest !== null ? cpsBest.toFixed(1) + ' CPS' : '— CPS');
   setEl('homeAimBest', aimBest !== null ? aimBest + ' pts' : '— pts');
   setEl('homeMemoryBest', memBest !== null ? 'Level ' + memBest : 'Level —');
   setEl('homeTypingBest', typeBest !== null ? typeBest + ' WPM' : '— WPM');
+  setEl('homeNumberBest', numBest !== null ? numBest + ' digits' : '— digits');
+  setEl('homeChimpBest', chimpBest !== null ? 'Level ' + chimpBest : 'Level —');
+  setEl('homeColorBest', colorBest !== null ? colorBest + ' pts' : '— pts');
 }
 
 function setEl(id, text) {
@@ -237,10 +427,6 @@ function showToast(msg, type = '') {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
 }
-
-/* ============================================================
-   LEVEL UP OVERLAY
-   ============================================================ */
 
 function showLevelUp(level) {
   const overlay = document.getElementById('levelupOverlay');
@@ -263,11 +449,11 @@ function getRating(type, value) {
       { max: Infinity, label: 'KEEP TRAINING', cls: 'rating-slow' }
     ],
     cps: [
-      { max: Infinity, min: 20, label: 'GODLIKE', cls: 'rating-godlike' },
-      { max: 20, min: 14, label: 'ELITE', cls: 'rating-elite' },
-      { max: 14, min: 9, label: 'GREAT', cls: 'rating-great' },
-      { max: 9, min: 5, label: 'AVERAGE', cls: 'rating-average' },
-      { max: 5, min: 0, label: 'KEEP TRAINING', cls: 'rating-slow' }
+      { min: 20, label: 'GODLIKE', cls: 'rating-godlike' },
+      { min: 14, label: 'ELITE', cls: 'rating-elite' },
+      { min: 9, label: 'GREAT', cls: 'rating-great' },
+      { min: 5, label: 'AVERAGE', cls: 'rating-average' },
+      { min: 0, label: 'KEEP TRAINING', cls: 'rating-slow' }
     ],
     aim: [
       { min: 800, label: 'GODLIKE', cls: 'rating-godlike' },
@@ -289,6 +475,27 @@ function getRating(type, value) {
       { min: 60, label: 'GREAT', cls: 'rating-great' },
       { min: 35, label: 'AVERAGE', cls: 'rating-average' },
       { min: 0, label: 'KEEP TRAINING', cls: 'rating-slow' }
+    ],
+    number: [
+      { min: 12, label: 'GODLIKE', cls: 'rating-godlike' },
+      { min: 9, label: 'ELITE', cls: 'rating-elite' },
+      { min: 7, label: 'GREAT', cls: 'rating-great' },
+      { min: 5, label: 'AVERAGE', cls: 'rating-average' },
+      { min: 0, label: 'KEEP TRAINING', cls: 'rating-slow' }
+    ],
+    chimp: [
+      { min: 12, label: 'GODLIKE', cls: 'rating-godlike' },
+      { min: 9, label: 'ELITE', cls: 'rating-elite' },
+      { min: 7, label: 'GREAT', cls: 'rating-great' },
+      { min: 5, label: 'AVERAGE', cls: 'rating-average' },
+      { min: 0, label: 'KEEP TRAINING', cls: 'rating-slow' }
+    ],
+    color: [
+      { min: 25, label: 'GODLIKE', cls: 'rating-godlike' },
+      { min: 18, label: 'ELITE', cls: 'rating-elite' },
+      { min: 12, label: 'GREAT', cls: 'rating-great' },
+      { min: 6, label: 'AVERAGE', cls: 'rating-average' },
+      { min: 0, label: 'KEEP TRAINING', cls: 'rating-slow' }
     ]
   };
 
@@ -304,6 +511,7 @@ function getRating(type, value) {
 }
 
 function applyRating(el, type, value) {
+  if (!el) return;
   const r = getRating(type, value);
   el.textContent = r.label;
   el.className = 'result-rating ' + r.cls;
@@ -334,13 +542,11 @@ function setupShare(btnId, boxId, inputId, copyBtnId, message) {
 }
 
 /* ============================================================
-   ============================================================
    TEST 1: REACTION TIME
-   ============================================================
    ============================================================ */
 
 const ReactionTest = (() => {
-  let state = 'idle'; // idle | waiting | ready | go | clicked | toosoon
+  let state = 'idle';
   let rounds = [];
   let currentRound = 0;
   const TOTAL_ROUNDS = 5;
@@ -380,9 +586,7 @@ const ReactionTest = (() => {
 
   function handleClick() {
     if (state === 'idle') {
-      // Start
-      currentRound = 0;
-      rounds = [];
+      currentRound = 0; rounds = [];
       isTrainingMode = document.getElementById('reactionMode')?.value === 'training';
       results.classList.add('hidden');
       arena.classList.remove('hidden');
@@ -390,19 +594,14 @@ const ReactionTest = (() => {
       startRound();
       return;
     }
-
     if (state === 'ready') {
-      // Too soon!
       clearTimeout(goTimeout);
       setState('toosoon');
       if (reactMsg) reactMsg.textContent = 'TOO SOON!';
       if (reactSub) reactSub.textContent = 'Wait for green before clicking';
-      setTimeout(() => {
-        if (isTrainingMode || currentRound < TOTAL_ROUNDS) startRound();
-      }, 1200);
+      setTimeout(() => { if (isTrainingMode || currentRound < TOTAL_ROUNDS) startRound(); }, 1200);
       return;
     }
-
     if (state === 'go') {
       const rt = Math.round(performance.now() - startTime);
       rounds.push(rt);
@@ -411,19 +610,11 @@ const ReactionTest = (() => {
       if (reactSub) reactSub.textContent = getRating('reaction', rt).label;
       currentRound++;
       updateRoundDisplay();
-
       if (isTrainingMode || currentRound < TOTAL_ROUNDS) {
-        setTimeout(() => {
-          if (state === 'clicked') startRound();
-        }, 1000);
+        setTimeout(() => { if (state === 'clicked') startRound(); }, 1000);
       } else {
         setTimeout(() => showResults(), 800);
       }
-      return;
-    }
-
-    if (state === 'clicked') {
-      // Waiting between rounds, ignore
       return;
     }
   }
@@ -431,34 +622,22 @@ const ReactionTest = (() => {
   function showResults() {
     setState('idle');
     results.classList.remove('hidden');
-
     const best = Math.min(...rounds);
     const avg = Math.round(rounds.reduce((a, b) => a + b, 0) / rounds.length);
-
     setEl('reactionTime', best);
     setEl('reactionAvg', `Average: ${avg}ms over ${rounds.length} rounds`);
     applyRating(document.getElementById('reactionRating'), 'reaction', best);
-
-    // Rounds display
     const rd = document.getElementById('roundsDisplay');
-    if (rd) {
-      rd.innerHTML = rounds.map((r, i) => `<span class="round-pill${r === best ? ' best' : ''}">${r}ms</span>`).join('');
-    }
-
-    // Save & XP
+    if (rd) rd.innerHTML = rounds.map((r) => `<span class="round-pill${r === best ? ' best' : ''}">${r}ms</span>`).join('');
     Storage.addHistory('reaction', best);
     Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
     const xpEarned = best < 150 ? 50 : best < 200 ? 30 : best < 250 ? 20 : 10;
     XPSystem.addXP(xpEarned);
     showToast(`+${xpEarned} XP earned!`, 'success');
-
-    // Share
     setupShare('reactionShare', 'reactionShareBox', 'reactionShareText', 'reactionCopyBtn',
       `⚡ I got ${best}ms reaction time on ReflexZone! Can you beat me? reflexzone.io`);
-
     document.getElementById('reactionRetry').onclick = () => {
-      results.classList.add('hidden');
-      setState('idle');
+      results.classList.add('hidden'); setState('idle');
       if (reactMsg) reactMsg.textContent = 'Click to Start';
       if (reactSub) reactSub.textContent = 'Wait for the screen to flash green';
     };
@@ -474,21 +653,12 @@ const ReactionTest = (() => {
 })();
 
 /* ============================================================
-   ============================================================
    TEST 2: CPS TEST
-   ============================================================
    ============================================================ */
 
 const CPSTest = (() => {
-  let running = false;
-  let clicks = 0;
-  let startTime = null;
-  let duration = 5; // seconds
-  let rafId = null;
-  let endTimer = null;
-
-  const CIRCUMFERENCE = 2 * Math.PI * 54; // r=54
-
+  let running = false, clicks = 0, startTime = null, duration = 5, rafId = null, endTimer = null;
+  const CIRCUMFERENCE = 2 * Math.PI * 54;
   const btn = document.getElementById('cpsBtn');
   const btnText = document.getElementById('cpsBtnText');
   const cpsNum = document.getElementById('cpsNumber');
@@ -499,20 +669,16 @@ const CPSTest = (() => {
 
   function setRing(fraction) {
     if (!ringFill) return;
-    const offset = CIRCUMFERENCE * (1 - fraction);
-    ringFill.style.strokeDashoffset = offset;
+    ringFill.style.strokeDashoffset = CIRCUMFERENCE * (1 - fraction);
   }
 
   function startTest() {
     duration = parseInt(document.getElementById('cpsDuration')?.value || '5');
-    running = true;
-    clicks = 0;
-    startTime = performance.now();
+    running = true; clicks = 0; startTime = performance.now();
     if (btnText) btnText.textContent = 'CLICKING...';
     btn.classList.add('active-state');
     results.classList.add('hidden');
     setRing(1);
-
     endTimer = setTimeout(() => finishTest(), duration * 1000);
     rafId = requestAnimationFrame(updateLoop);
   }
@@ -522,12 +688,10 @@ const CPSTest = (() => {
     const elapsed = (performance.now() - startTime) / 1000;
     const remaining = Math.max(0, duration - elapsed);
     const cps = elapsed > 0 ? (clicks / elapsed).toFixed(2) : '0.00';
-
     if (cpsNum) cpsNum.textContent = cps;
     if (clickCount) clickCount.textContent = clicks;
     if (timeLeft) timeLeft.textContent = remaining.toFixed(1);
     setRing(remaining / duration);
-
     rafId = requestAnimationFrame(updateLoop);
   }
 
@@ -535,59 +699,43 @@ const CPSTest = (() => {
     running = false;
     cancelAnimationFrame(rafId);
     clearTimeout(endTimer);
-
-    const elapsed = duration;
-    const finalCps = (clicks / elapsed);
-
+    const finalCps = (clicks / duration);
     if (cpsNum) cpsNum.textContent = finalCps.toFixed(2);
     if (timeLeft) timeLeft.textContent = '0.0';
     if (btnText) btnText.textContent = 'CLICK TO RETRY';
     btn.classList.remove('active-state');
-
     results.classList.remove('hidden');
     setEl('cpsFinalScore', finalCps.toFixed(2));
     setEl('cpsTotalClicks', clicks + ' total clicks in ' + duration + 's');
     applyRating(document.getElementById('cpsRating'), 'cps', finalCps);
-
     Storage.addHistory('cps', parseFloat(finalCps.toFixed(2)));
     Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
     const xpEarned = finalCps >= 14 ? 50 : finalCps >= 9 ? 30 : finalCps >= 5 ? 20 : 10;
     XPSystem.addXP(xpEarned);
     showToast(`+${xpEarned} XP earned!`, 'success');
-
     setupShare('cpsShare', 'cpsShareBox', 'cpsShareText', 'cpsCopyBtn',
       `🖱 I got ${finalCps.toFixed(2)} CPS (${clicks} clicks in ${duration}s) on ReflexZone! reflexzone.io`);
-
     document.getElementById('cpsRetry').onclick = () => {
       results.classList.add('hidden');
       if (btnText) btnText.textContent = 'CLICK TO START';
       if (cpsNum) cpsNum.textContent = '0.00';
       if (clickCount) clickCount.textContent = '0';
       if (timeLeft) timeLeft.textContent = duration + '.0';
-      setRing(1);
-      clicks = 0;
+      setRing(1); clicks = 0;
     };
   }
 
   function handleClick(e) {
-    // Ripple
     const ripple = document.getElementById('cpsRipple');
     if (ripple) {
       const rect = btn.getBoundingClientRect();
       const x = (e.clientX || e.touches?.[0]?.clientX || rect.left + rect.width / 2) - rect.left;
       const y = (e.clientY || e.touches?.[0]?.clientY || rect.top + rect.height / 2) - rect.top;
-      ripple.style.left = (x - 5) + 'px';
-      ripple.style.top = (y - 5) + 'px';
-      ripple.style.animation = 'none';
-      void ripple.offsetWidth;
+      ripple.style.left = (x - 5) + 'px'; ripple.style.top = (y - 5) + 'px';
+      ripple.style.animation = 'none'; void ripple.offsetWidth;
       ripple.style.animation = 'ripple 0.4s ease forwards';
     }
-
-    if (!running) {
-      startTest();
-    } else {
-      clicks++;
-    }
+    if (!running) startTest(); else clicks++;
   }
 
   function init() {
@@ -600,25 +748,13 @@ const CPSTest = (() => {
 })();
 
 /* ============================================================
-   ============================================================
    TEST 3: AIM TRAINER
-   ============================================================
    ============================================================ */
 
 const AimTrainer = (() => {
-  let running = false;
-  let score = 0;
-  let hits = 0;
-  let misses = 0;
-  let timeLeft = 30;
-  let timings = [];
-  let lastTargetTime = null;
-  let targetEl = null;
-  let timerInterval = null;
-
+  let running = false, score = 0, hits = 0, misses = 0, timeLeft = 30, timings = [], lastTargetTime = null, targetEl = null, timerInterval = null;
   const arena = document.getElementById('aimArena');
   const results = document.getElementById('aimResults');
-
   const DIFFICULTY_CONFIG = {
     easy:   { size: 70, lifespan: 3000, interval: [800, 1400] },
     normal: { size: 50, lifespan: 2000, interval: [600, 1000] },
@@ -626,45 +762,29 @@ const AimTrainer = (() => {
     insane: { size: 22, lifespan: 1000, interval: [250, 500] }
   };
 
-  function getDiff() {
-    return DIFFICULTY_CONFIG[document.getElementById('aimDifficulty')?.value || 'normal'];
-  }
+  function getDiff() { return DIFFICULTY_CONFIG[document.getElementById('aimDifficulty')?.value || 'normal']; }
 
   function spawnTarget() {
     if (!running) return;
     if (targetEl) targetEl.remove();
-
     const conf = getDiff();
-    // Scale size with score for difficulty ramp-up
     const scale = Math.max(0.5, 1 - (score / 2000) * 0.3);
     const size = Math.round(conf.size * scale);
-
     const arenaRect = arena.getBoundingClientRect();
     const margin = size / 2 + 10;
-    const maxX = arenaRect.width - margin * 2;
-    const maxY = arenaRect.height - margin * 2;
-
-    const x = margin + Math.random() * maxX;
-    const y = margin + Math.random() * maxY;
-
+    const x = margin + Math.random() * (arenaRect.width - margin * 2);
+    const y = margin + Math.random() * (arenaRect.height - margin * 2);
     targetEl = document.createElement('div');
     targetEl.className = 'aim-target';
     targetEl.style.cssText = `width:${size}px;height:${size}px;left:${x - size/2}px;top:${y - size/2}px`;
-
     lastTargetTime = performance.now();
-
     targetEl.addEventListener('click', hitTarget);
     targetEl.addEventListener('touchstart', (e) => { e.preventDefault(); hitTarget(e); }, { passive: false });
     arena.appendChild(targetEl);
-
-    // Auto-remove if not clicked (missed)
     setTimeout(() => {
       if (targetEl && document.contains(targetEl)) {
-        targetEl.remove();
-        targetEl = null;
-        misses++;
+        targetEl.remove(); targetEl = null; misses++;
         updateAimHud();
-        // Miss flash
         const flash = document.createElement('div');
         flash.className = 'miss-flash';
         arena.appendChild(flash);
@@ -678,24 +798,15 @@ const AimTrainer = (() => {
     if (!running) return;
     const conf = getDiff();
     const [min, max] = conf.interval;
-    const delay = min + Math.random() * (max - min);
-    setTimeout(() => {
-      if (running) spawnTarget();
-    }, delay);
+    setTimeout(() => { if (running) spawnTarget(); }, min + Math.random() * (max - min));
   }
 
-  function hitTarget(e) {
+  function hitTarget() {
     if (!running || !targetEl) return;
     const rt = Math.round(performance.now() - lastTargetTime);
     timings.push(rt);
     hits++;
-
-    // Score: faster = more points
-    const pointsBase = 10;
-    const speedBonus = Math.max(0, Math.round((2000 - rt) / 100));
-    score += pointsBase + speedBonus;
-
-    // Hit effect
+    score += 10 + Math.max(0, Math.round((2000 - rt) / 100));
     const rect = targetEl.getBoundingClientRect();
     const arenaRect = arena.getBoundingClientRect();
     const effect = document.createElement('div');
@@ -704,130 +815,75 @@ const AimTrainer = (() => {
     effect.style.top = (rect.top - arenaRect.top + rect.height / 2) + 'px';
     arena.appendChild(effect);
     setTimeout(() => effect.remove(), 300);
-
-    targetEl.remove();
-    targetEl = null;
+    targetEl.remove(); targetEl = null;
     updateAimHud();
     scheduleNextTarget();
   }
 
   function updateAimHud() {
-    setEl('aimScore', score);
-    setEl('aimHits', hits);
-    const totalAttempts = hits + misses;
-    const acc = totalAttempts > 0 ? Math.round((hits / totalAttempts) * 100) : 0;
-    setEl('aimAccuracy', acc + '%');
+    setEl('aimScore', score); setEl('aimHits', hits);
+    const total = hits + misses;
+    setEl('aimAccuracy', (total > 0 ? Math.round((hits / total) * 100) : 0) + '%');
   }
 
   function startTest() {
-    running = true;
-    score = 0; hits = 0; misses = 0;
-    timings = [];
-    timeLeft = 30;
-    targetEl = null;
-
+    running = true; score = 0; hits = 0; misses = 0; timings = []; timeLeft = 30; targetEl = null;
     document.getElementById('aimStartOverlay')?.remove();
-    updateAimHud();
-    results.classList.add('hidden');
-
+    updateAimHud(); results.classList.add('hidden');
     spawnTarget();
-
     timerInterval = setInterval(() => {
-      timeLeft--;
-      setEl('aimTime', timeLeft);
+      timeLeft--; setEl('aimTime', timeLeft);
       if (timeLeft <= 0) finishTest();
     }, 1000);
   }
 
   function finishTest() {
-    running = false;
-    clearInterval(timerInterval);
+    running = false; clearInterval(timerInterval);
     if (targetEl) { targetEl.remove(); targetEl = null; }
-
-    const totalAttempts = hits + misses;
-    const accuracy = totalAttempts > 0 ? Math.round((hits / totalAttempts) * 100) : 0;
-    const avgTime = timings.length > 0
-      ? Math.round(timings.reduce((a, b) => a + b, 0) / timings.length)
-      : 0;
-
+    const total = hits + misses;
+    const accuracy = total > 0 ? Math.round((hits / total) * 100) : 0;
+    const avgTime = timings.length > 0 ? Math.round(timings.reduce((a,b) => a+b,0) / timings.length) : 0;
     results.classList.remove('hidden');
-    setEl('aimFinalScore', score);
-    applyRating(document.getElementById('aimRating'), 'aim', score);
-    setEl('aimResHits', hits);
-    setEl('aimResMisses', misses);
-    setEl('aimResAccuracy', accuracy + '%');
-    setEl('aimResAvgTime', avgTime + 'ms');
-
+    setEl('aimFinalScore', score); applyRating(document.getElementById('aimRating'), 'aim', score);
+    setEl('aimResHits', hits); setEl('aimResMisses', misses);
+    setEl('aimResAccuracy', accuracy + '%'); setEl('aimResAvgTime', avgTime + 'ms');
     Storage.addHistory('aim', score);
     Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
     const xpEarned = score >= 800 ? 50 : score >= 400 ? 30 : score >= 150 ? 20 : 10;
     XPSystem.addXP(xpEarned);
     showToast(`+${xpEarned} XP earned!`, 'success');
-
     setupShare('aimShare', 'aimShareBox', 'aimShareText', 'aimCopyBtn',
       `🎯 I scored ${score} pts (${accuracy}% accuracy) in Aim Trainer on ReflexZone! reflexzone.io`);
-
     document.getElementById('aimRetry').onclick = () => {
       results.classList.add('hidden');
-      // Rebuild overlay
       const overlay = document.createElement('div');
-      overlay.id = 'aimStartOverlay';
-      overlay.className = 'aim-start-overlay';
-      overlay.innerHTML = `<div class="aim-start-icon">🎯</div>
-        <div class="aim-start-title">Aim Trainer</div>
+      overlay.id = 'aimStartOverlay'; overlay.className = 'aim-start-overlay';
+      overlay.innerHTML = `<div class="aim-start-icon">🎯</div><div class="aim-start-title">Aim Trainer</div>
         <div class="aim-start-sub">Click targets as fast as possible<br/>30 seconds, difficulty ramps up</div>
         <button class="btn-primary btn-large" id="aimStartBtn">Start Training</button>`;
       arena.appendChild(overlay);
       document.getElementById('aimStartBtn').onclick = startTest;
-      setEl('aimScore', 0);
-      setEl('aimTime', 30);
-      setEl('aimAccuracy', '—');
-      setEl('aimHits', 0);
+      setEl('aimScore', 0); setEl('aimTime', 30); setEl('aimAccuracy', '—'); setEl('aimHits', 0);
     };
-
-    // Miss clicks on arena after game
-    arena.onclick = null;
-  }
-
-  function handleArenaMiss(e) {
-    if (!running) return;
-    if (e.target === arena) {
-      misses++;
-      updateAimHud();
-    }
   }
 
   function init() {
     if (!arena) return;
     const startBtn = document.getElementById('aimStartBtn');
     if (startBtn) startBtn.onclick = startTest;
-    arena.addEventListener('click', handleArenaMiss);
-    arena.addEventListener('touchstart', (e) => {
-      if (e.target === arena && running) {
-        e.preventDefault();
-        misses++;
-        updateAimHud();
-      }
-    }, { passive: false });
+    arena.addEventListener('click', (e) => { if (!running) return; if (e.target === arena) { misses++; updateAimHud(); } });
   }
 
   return { init };
 })();
 
 /* ============================================================
-   ============================================================
    TEST 4: MEMORY TEST
-   ============================================================
    ============================================================ */
 
 const MemoryTest = (() => {
-  let level = 1;
-  let sequence = [];
-  let playerSeq = [];
-  let phase = 'idle'; // idle | showing | input
-  let tiles = [];
+  let level = 1, sequence = [], playerSeq = [], phase = 'idle', tiles = [];
   const GRID_SIZE = 9;
-
   const grid = document.getElementById('memoryGrid');
   const results = document.getElementById('memoryResults');
   const startBtn = document.getElementById('memStartBtn');
@@ -835,87 +891,50 @@ const MemoryTest = (() => {
 
   function buildGrid() {
     if (!grid) return;
-    grid.innerHTML = '';
-    tiles = [];
+    grid.innerHTML = ''; tiles = [];
     for (let i = 0; i < GRID_SIZE; i++) {
       const tile = document.createElement('div');
       tile.className = 'mem-tile disabled';
       tile.dataset.index = i;
       tile.addEventListener('click', () => handleTileClick(i));
       tile.addEventListener('touchstart', (e) => { e.preventDefault(); handleTileClick(i); }, { passive: false });
-      grid.appendChild(tile);
-      tiles.push(tile);
+      grid.appendChild(tile); tiles.push(tile);
     }
   }
 
   function generateSequence() {
     sequence = [];
-    for (let i = 0; i < level + 2; i++) {
-      sequence.push(Math.floor(Math.random() * GRID_SIZE));
-    }
+    for (let i = 0; i < level + 2; i++) sequence.push(Math.floor(Math.random() * GRID_SIZE));
   }
 
   async function showSequence() {
-    phase = 'showing';
-    setEl('memMsg', 'Watch the sequence...');
-    setTilesDisabled(true);
-    await sleep(500);
-
-    for (const idx of sequence) {
-      await flashTile(idx, 600, 400);
-    }
-
-    await sleep(300);
-    phase = 'input';
-    playerSeq = [];
-    setEl('memMsg', 'Your turn! Repeat it.');
-    setTilesDisabled(false);
+    phase = 'showing'; setEl('memMsg', 'Watch the sequence...'); setTilesDisabled(true); await sleep(500);
+    for (const idx of sequence) await flashTile(idx, 600, 400);
+    await sleep(300); phase = 'input'; playerSeq = []; setEl('memMsg', 'Your turn! Repeat it.'); setTilesDisabled(false);
   }
 
   async function flashTile(idx, onMs, offMs) {
-    tiles[idx].classList.add('active');
-    await sleep(onMs);
-    tiles[idx].classList.remove('active');
-    await sleep(offMs);
+    tiles[idx].classList.add('active'); await sleep(onMs); tiles[idx].classList.remove('active'); await sleep(offMs);
   }
 
   function setTilesDisabled(disabled) {
-    tiles.forEach(t => {
-      if (disabled) t.classList.add('disabled');
-      else t.classList.remove('disabled');
-    });
+    tiles.forEach(t => { if (disabled) t.classList.add('disabled'); else t.classList.remove('disabled'); });
   }
 
   async function handleTileClick(idx) {
     if (phase !== 'input') return;
     tiles[idx].classList.add('active');
     setTimeout(() => tiles[idx].classList.remove('active'), 300);
-
     playerSeq.push(idx);
     const pos = playerSeq.length - 1;
-
     if (playerSeq[pos] !== sequence[pos]) {
-      // Wrong!
-      tiles[idx].classList.add('wrong');
-      phase = 'idle';
-      setTilesDisabled(true);
-      await sleep(600);
-      gameOver();
-      return;
+      tiles[idx].classList.add('wrong'); phase = 'idle'; setTilesDisabled(true); await sleep(600); gameOver(); return;
     }
-
     if (playerSeq.length === sequence.length) {
-      // Level complete!
-      tiles.forEach(t => t.classList.add('correct'));
-      setEl('memMsg', `Level ${level} Complete! ✓`);
-      phase = 'idle';
-      setTilesDisabled(true);
-      await sleep(900);
+      tiles.forEach(t => t.classList.add('correct')); setEl('memMsg', `Level ${level} Complete! ✓`);
+      phase = 'idle'; setTilesDisabled(true); await sleep(900);
       tiles.forEach(t => t.classList.remove('correct'));
-      level++;
-      setEl('memLevel', level);
-      generateSequence();
-      await showSequence();
+      level++; setEl('memLevel', level); generateSequence(); await showSequence();
     }
   }
 
@@ -923,209 +942,579 @@ const MemoryTest = (() => {
     const reached = level;
     const best = Math.max(reached, Storage.get('memory_best', 0));
     Storage.set('memory_best', best);
-
     results.classList.remove('hidden');
     if (controls) controls.classList.add('hidden');
-    setEl('memFinalLevel', reached);
-    applyRating(document.getElementById('memRating'), 'memory', reached);
-
+    setEl('memFinalLevel', reached); applyRating(document.getElementById('memRating'), 'memory', reached);
     Storage.addHistory('memory', reached);
     Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
     const xpEarned = reached >= 10 ? 50 : reached >= 8 ? 40 : reached >= 6 ? 25 : reached >= 4 ? 15 : 10;
-    XPSystem.addXP(xpEarned);
-    showToast(`+${xpEarned} XP earned!`, 'success');
-    setEl('memBest', best);
-
+    XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success'); setEl('memBest', best);
     setupShare('memShare', 'memShareBox', 'memShareText', 'memCopyBtn',
       `🧠 I reached Level ${reached} in Memory Test on ReflexZone! Can you beat me? reflexzone.io`);
-
     document.getElementById('memRetry').onclick = () => {
-      results.classList.add('hidden');
-      if (controls) controls.classList.remove('hidden');
-      level = 1;
-      setEl('memLevel', 1);
-      setEl('memMsg', 'Watch the sequence...');
+      results.classList.add('hidden'); if (controls) controls.classList.remove('hidden');
+      level = 1; setEl('memLevel', 1); setEl('memMsg', 'Watch the sequence...');
       tiles.forEach(t => { t.className = 'mem-tile disabled'; });
     };
   }
 
   async function startGame() {
     if (controls) controls.classList.add('hidden');
-    results.classList.add('hidden');
-    level = 1;
-    setEl('memLevel', 1);
+    results.classList.add('hidden'); level = 1; setEl('memLevel', 1);
     setEl('memBest', Storage.get('memory_best', 0));
-    buildGrid();
-    generateSequence();
-    await showSequence();
+    buildGrid(); generateSequence(); await showSequence();
   }
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  function init() {
-    buildGrid();
-    if (startBtn) startBtn.onclick = startGame;
-  }
+  function init() { buildGrid(); if (startBtn) startBtn.onclick = startGame; }
 
   return { init };
 })();
 
 /* ============================================================
-   ============================================================
-   TEST 5: TYPING SPEED
-   ============================================================
+   TEST 5: TYPING SPEED (Enhanced with random words)
    ============================================================ */
 
 const TypingTest = (() => {
-  let started = false;
-  let finished = false;
-  let startTime = null;
-  let timerInterval = null;
-  let duration = 60;
-  let totalTyped = 0;
-  let errors = 0;
-  let currentText = '';
-  let charIndex = 0;
+  let started = false, finished = false, startTime = null, timerInterval = null;
+  let duration = 60, totalTyped = 0, errors = 0, currentWords = [], wordIndex = 0, charIndex = 0;
 
   const promptEl = document.getElementById('typePrompt');
   const inputEl = document.getElementById('typeInput');
   const results = document.getElementById('typingResults');
 
-  function getNewParagraph() {
-    return TYPING_PARAGRAPHS[Math.floor(Math.random() * TYPING_PARAGRAPHS.length)];
+  function getWordList() {
+    const mode = document.getElementById('typingMode')?.value || 'words';
+    if (mode === 'sentences') return null; // sentence mode
+    if (mode === 'numbers') return WORD_BANKS.numbers[Math.floor(Math.random() * WORD_BANKS.numbers.length)].split(' ');
+    if (mode === 'code') return WORD_BANKS.code[Math.floor(Math.random() * WORD_BANKS.code.length)].split(' ');
+    // Random words - pick 80 random words
+    const bank = WORD_BANKS.words;
+    const picked = [];
+    for (let i = 0; i < 80; i++) picked.push(bank[Math.floor(Math.random() * bank.length)]);
+    return picked;
   }
 
-  function renderPrompt() {
-    if (!promptEl) return;
-    promptEl.innerHTML = currentText.split('').map((ch, i) => {
-      let cls = 'char-pending';
-      if (i < charIndex) cls = 'char-correct';
-      if (i === charIndex) cls = 'char-current';
-      return `<span class="${cls}">${ch === ' ' ? '&nbsp;' : ch}</span>`;
-    }).join('');
+  function getSentenceText() {
+    const sentences = WORD_BANKS.sentences;
+    let text = '';
+    while (text.length < 300) {
+      text += (text ? ' ' : '') + sentences[Math.floor(Math.random() * sentences.length)];
+    }
+    return text;
   }
 
   function setupTest() {
     duration = parseInt(document.getElementById('typingDuration')?.value || '60');
-    currentText = getNewParagraph();
-    charIndex = 0;
-    errors = 0;
-    totalTyped = 0;
-    started = false;
-    finished = false;
+    const mode = document.getElementById('typingMode')?.value || 'words';
+
+    totalTyped = 0; errors = 0; wordIndex = 0; charIndex = 0;
+    started = false; finished = false;
+
+    if (mode === 'sentences') {
+      // Sentence mode: character by character
+      currentWords = getSentenceText().split('');
+    } else {
+      currentWords = getWordList();
+    }
+
     if (inputEl) { inputEl.value = ''; inputEl.disabled = false; }
     if (timerInterval) clearInterval(timerInterval);
-    setEl('typeTimer', duration);
-    setEl('typeWpm', 0);
-    setEl('typeAccuracy', '100%');
-    setEl('typeErrors', 0);
+    setEl('typeTimer', duration); setEl('typeWpm', 0); setEl('typeAccuracy', '100%'); setEl('typeErrors', 0);
     results.classList.add('hidden');
-    renderPrompt();
+    renderWordPrompt();
+  }
+
+  function renderWordPrompt() {
+    if (!promptEl) return;
+    const mode = document.getElementById('typingMode')?.value || 'words';
+
+    if (mode === 'sentences') {
+      // Char-by-char for sentences
+      const text = currentWords.join('');
+      promptEl.innerHTML = text.split('').map((ch, i) => {
+        let cls = i < charIndex ? 'char-correct' : i === charIndex ? 'char-current' : 'char-pending';
+        return `<span class="${cls}">${ch === ' ' ? '&nbsp;' : ch}</span>`;
+      }).join('');
+      return;
+    }
+
+    // Word-by-word rendering
+    promptEl.innerHTML = currentWords.map((word, wi) => {
+      if (wi < wordIndex) return `<span class="word-done">${word}</span> `;
+      if (wi === wordIndex) {
+        // Current word with char highlighting
+        return '<span class="word-current">' + word.split('').map((ch, ci) => {
+          let cls = ci < charIndex ? 'char-correct' : ci === charIndex ? 'char-current' : 'char-pending';
+          return `<span class="${cls}">${ch}</span>`;
+        }).join('') + '</span> ';
+      }
+      return `<span class="word-pending">${word}</span> `;
+    }).join('');
+
+    // Auto-scroll to current word
+    const currentWordEl = promptEl.querySelector('.word-current');
+    if (currentWordEl) {
+      const topOffset = currentWordEl.offsetTop;
+      if (topOffset > 60) promptEl.scrollTop = topOffset - 20;
+    }
   }
 
   function calcWPM() {
     if (!startTime) return 0;
-    const elapsed = (performance.now() - startTime) / 60000; // in minutes
-    const words = charIndex / 5; // standard: 5 chars = 1 word
+    const elapsed = (performance.now() - startTime) / 60000;
+    const words = totalTyped / 5;
     return elapsed > 0 ? Math.round(words / elapsed) : 0;
   }
 
   function handleInput(e) {
     if (finished) return;
-
-    const inputVal = inputEl.value;
+    const mode = document.getElementById('typingMode')?.value || 'words';
 
     if (!started) {
-      started = true;
-      startTime = performance.now();
+      started = true; startTime = performance.now();
       let timeLeft = duration;
       timerInterval = setInterval(() => {
-        timeLeft--;
-        setEl('typeTimer', timeLeft);
-        const wpm = calcWPM();
-        setEl('typeWpm', wpm);
+        timeLeft--; setEl('typeTimer', timeLeft); setEl('typeWpm', calcWPM());
         if (timeLeft <= 0) finishTest();
       }, 1000);
     }
 
-    // Validate last typed character
-    const lastChar = inputVal[inputVal.length - 1];
-    const expected = currentText[charIndex];
+    const val = inputEl.value;
 
-    if (lastChar === expected) {
-      charIndex++;
-      totalTyped++;
-    } else if (lastChar !== undefined) {
-      errors++;
-      totalTyped++;
+    if (mode === 'sentences') {
+      const lastChar = val[val.length - 1];
+      const expected = currentWords[charIndex];
+      if (lastChar === expected) { charIndex++; totalTyped++; }
+      else if (lastChar !== undefined) { errors++; totalTyped++; }
+      if (val.length > 40) inputEl.value = '';
+      if (charIndex >= currentWords.length) { currentWords = getSentenceText().split(''); charIndex = 0; inputEl.value = ''; }
+    } else {
+      // Word mode: space advances to next word
+      if (val.endsWith(' ')) {
+        const typed = val.trim();
+        const expected = currentWords[wordIndex] || '';
+        totalTyped += expected.length + 1;
+        // Count errors
+        for (let i = 0; i < Math.max(typed.length, expected.length); i++) {
+          if (typed[i] !== expected[i]) errors++;
+        }
+        wordIndex++;
+        charIndex = 0;
+        inputEl.value = '';
+        // Load more words if running low
+        if (wordIndex >= currentWords.length - 10) {
+          const bank = WORD_BANKS.words;
+          for (let i = 0; i < 20; i++) currentWords.push(bank[Math.floor(Math.random() * bank.length)]);
+        }
+      } else {
+        charIndex = val.length;
+      }
     }
-
-    // Clear input periodically to avoid overflow
-    if (inputVal.length > 40) inputEl.value = '';
 
     const acc = totalTyped > 0 ? Math.round((1 - errors / totalTyped) * 100) : 100;
-    setEl('typeAccuracy', acc + '%');
-    setEl('typeErrors', errors);
-    setEl('typeWpm', calcWPM());
-
-    renderPrompt();
-
-    // If finished the text, load new one
-    if (charIndex >= currentText.length) {
-      currentText = getNewParagraph();
-      charIndex = 0;
-      inputEl.value = '';
-      renderPrompt();
-    }
+    setEl('typeAccuracy', acc + '%'); setEl('typeErrors', errors); setEl('typeWpm', calcWPM());
+    renderWordPrompt();
   }
 
   function finishTest() {
-    finished = true;
-    clearInterval(timerInterval);
+    finished = true; clearInterval(timerInterval);
     if (inputEl) inputEl.disabled = true;
-
     const wpm = calcWPM();
     const acc = totalTyped > 0 ? Math.round((1 - errors / totalTyped) * 100) : 100;
-    const words = Math.round(charIndex / 5);
-    const chars = charIndex;
-
+    const words = Math.round(totalTyped / 5); const chars = totalTyped;
     results.classList.remove('hidden');
-    setEl('typeFinalWpm', wpm);
-    applyRating(document.getElementById('typeRating'), 'typing', wpm);
-    setEl('typeResAccuracy', acc + '%');
-    setEl('typeResWords', words);
-    setEl('typeResChars', chars);
-    setEl('typeResErrors', errors);
-
+    setEl('typeFinalWpm', wpm); applyRating(document.getElementById('typeRating'), 'typing', wpm);
+    setEl('typeResAccuracy', acc + '%'); setEl('typeResWords', words); setEl('typeResChars', chars); setEl('typeResErrors', errors);
     Storage.addHistory('typing', wpm);
     Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
     const xpEarned = wpm >= 130 ? 50 : wpm >= 90 ? 35 : wpm >= 60 ? 25 : wpm >= 35 ? 15 : 10;
-    XPSystem.addXP(xpEarned);
-    showToast(`+${xpEarned} XP earned!`, 'success');
-
+    XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success');
     setupShare('typeShare', 'typeShareBox', 'typeShareText', 'typeCopyBtn',
       `⌨️ I typed ${wpm} WPM with ${acc}% accuracy on ReflexZone! reflexzone.io`);
-
-    document.getElementById('typeRetry').onclick = () => {
-      setupTest();
-      if (inputEl) inputEl.focus();
-    };
+    document.getElementById('typeRetry').onclick = () => { setupTest(); if (inputEl) inputEl.focus(); };
   }
 
   function init() {
     if (!inputEl) return;
     setupTest();
     inputEl.addEventListener('input', handleInput);
-    inputEl.addEventListener('focus', () => {
-      if (!started && !finished) renderPrompt();
-    });
-
-    // Reset test when duration changes
-    const durSelect = document.getElementById('typingDuration');
-    if (durSelect) durSelect.addEventListener('change', setupTest);
+    document.getElementById('typingDuration')?.addEventListener('change', setupTest);
+    document.getElementById('typingMode')?.addEventListener('change', setupTest);
   }
 
   return { init, setupTest };
+})();
+
+/* ============================================================
+   TEST 6: NUMBER MEMORY (NEW)
+   ============================================================ */
+
+const NumberMemory = (() => {
+  let level = 1, currentNumber = '', phase = 'idle';
+  const arena = document.getElementById('numberArena');
+  const displayArea = document.getElementById('numDisplayArea');
+  const inputArea = document.getElementById('numInputArea');
+  const results = document.getElementById('numberResults');
+
+  function generateNumber(digits) {
+    let num = '';
+    for (let i = 0; i < digits; i++) num += i === 0 ? (Math.floor(Math.random() * 9) + 1) : Math.floor(Math.random() * 10);
+    return num;
+  }
+
+  async function startRound() {
+    if (inputArea) inputArea.classList.add('hidden');
+    if (results) results.classList.add('hidden');
+
+    currentNumber = generateNumber(level + 2);
+    phase = 'showing';
+
+    // Show the number with countdown
+    const showDuration = Math.min(1000 + (level + 2) * 500, 6000);
+
+    displayArea.innerHTML = `
+      <div class="num-flash-wrapper">
+        <div class="num-countdown" id="numCountdown">GET READY</div>
+        <div class="num-flash-number hidden" id="numFlashNumber">${currentNumber}</div>
+        <div class="num-timer-bar"><div class="num-timer-fill" id="numTimerFill"></div></div>
+      </div>`;
+
+    await sleep(800);
+    const countEl = document.getElementById('numCountdown');
+    const numEl = document.getElementById('numFlashNumber');
+    const fillEl = document.getElementById('numTimerFill');
+
+    if (countEl) countEl.classList.add('hidden');
+    if (numEl) numEl.classList.remove('hidden');
+
+    // Animate timer bar
+    if (fillEl) {
+      fillEl.style.transition = `width ${showDuration}ms linear`;
+      fillEl.style.width = '100%';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { fillEl.style.width = '0%'; });
+      });
+    }
+
+    await sleep(showDuration);
+
+    // Hide number, show input
+    if (numEl) numEl.textContent = '?'.repeat(currentNumber.length);
+    phase = 'input';
+
+    displayArea.innerHTML = `<div class="num-flash-wrapper"><div class="num-flash-number blurred">${'?'.repeat(currentNumber.length)}</div></div>`;
+
+    if (inputArea) {
+      inputArea.classList.remove('hidden');
+      const numInput = document.getElementById('numInput');
+      if (numInput) { numInput.value = ''; numInput.focus(); }
+    }
+  }
+
+  function submitAnswer() {
+    if (phase !== 'input') return;
+    const inputEl = document.getElementById('numInput');
+    const typed = (inputEl?.value || '').trim();
+
+    if (typed === currentNumber) {
+      // Correct!
+      level++;
+      setEl('numLevel', level);
+      showToast('✓ Correct! Next level...', 'success');
+      displayArea.innerHTML = `<div class="num-flash-wrapper"><div class="num-correct-flash">✓ ${currentNumber}</div></div>`;
+      setTimeout(() => startRound(), 1000);
+    } else {
+      // Wrong
+      displayArea.innerHTML = `<div class="num-flash-wrapper">
+        <div class="num-wrong-flash">✗ ${currentNumber}</div>
+        <div class="num-wrong-sub">You typed: ${typed || '(nothing)'}</div>
+      </div>`;
+      if (inputArea) inputArea.classList.add('hidden');
+      setTimeout(() => gameOver(), 1200);
+    }
+  }
+
+  function gameOver() {
+    const reached = level + 1; // digits memorized = level + 2 - 1 = level + 1
+    const digits = level + 1;
+    const best = Math.max(digits, Storage.get('number_best', 0));
+    Storage.set('number_best', best);
+
+    results.classList.remove('hidden');
+    displayArea.innerHTML = `<div class="num-flash-wrapper"><div class="num-start-icon">🔢</div></div>`;
+
+    setEl('numFinalLevel', digits);
+    applyRating(document.getElementById('numRating'), 'number', digits);
+    setEl('numBestDisplay', best);
+
+    Storage.addHistory('number', digits);
+    Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
+    const xpEarned = digits >= 12 ? 50 : digits >= 9 ? 35 : digits >= 7 ? 25 : digits >= 5 ? 15 : 10;
+    XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success');
+
+    setupShare('numShare', 'numShareBox', 'numShareText', 'numCopyBtn',
+      `🔢 I memorized a ${digits}-digit number on ReflexZone! Can you beat me? reflexzone.io`);
+
+    document.getElementById('numRetry').onclick = () => {
+      results.classList.add('hidden');
+      level = 1; setEl('numLevel', 1);
+      displayArea.innerHTML = `<div class="num-start-overlay" id="numStartOverlay">
+        <div class="num-start-icon">🔢</div>
+        <div class="num-start-title">Number Memory</div>
+        <div class="num-start-sub">A number will flash on screen.<br/>Memorize it, then type it back.</div>
+        <button class="btn-primary btn-large" id="numStartBtn">Start Test</button></div>`;
+      document.getElementById('numStartBtn').onclick = () => startRound();
+    };
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function init() {
+    document.getElementById('numStartBtn')?.addEventListener('click', () => startRound());
+    document.getElementById('numSubmitBtn')?.addEventListener('click', submitAnswer);
+    document.getElementById('numInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitAnswer();
+    });
+  }
+
+  return { init };
+})();
+
+/* ============================================================
+   TEST 7: CHIMP TEST (NEW)
+   ============================================================ */
+
+const ChimpTest = (() => {
+  let numCount = 4, lives = 3, nextToClick = 1, numbers = [], phase = 'idle';
+  const arena = document.getElementById('chimpArena');
+  const results = document.getElementById('chimpResults');
+
+  const GRID_W = 5, GRID_H = 4;
+
+  function renderLives() {
+    setEl('chimpLives', '❤️'.repeat(lives) + '🖤'.repeat(Math.max(0, 3 - lives)));
+  }
+
+  function buildRound() {
+    phase = 'showing';
+    numbers = [];
+    const cells = new Set();
+    while (cells.size < numCount) cells.add(Math.floor(Math.random() * GRID_W * GRID_H));
+    const positions = [...cells];
+
+    // Create grid
+    let gridHTML = '<div class="chimp-grid">';
+    const numArr = Array.from({length: numCount}, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+
+    for (let i = 0; i < GRID_W * GRID_H; i++) {
+      const posIdx = positions.indexOf(i);
+      if (posIdx >= 0) {
+        const n = numArr[posIdx];
+        numbers.push({ num: n, cell: i });
+        gridHTML += `<div class="chimp-cell has-num" data-num="${n}">${n}</div>`;
+      } else {
+        gridHTML += `<div class="chimp-cell"></div>`;
+      }
+    }
+    gridHTML += '</div>';
+    arena.innerHTML = gridHTML;
+
+    // After 1.5s, hide numbers
+    setTimeout(() => {
+      if (phase !== 'showing') return;
+      arena.querySelectorAll('.chimp-cell.has-num').forEach(el => el.textContent = '');
+      phase = 'clicking';
+      nextToClick = 1;
+    }, Math.max(800, 1500 - (numCount - 4) * 100));
+  }
+
+  function handleCellClick(e) {
+    const cell = e.target.closest('.chimp-cell');
+    if (!cell || phase !== 'clicking') return;
+    const num = parseInt(cell.dataset.num);
+    if (isNaN(num)) {
+      // Clicked empty cell
+      wrongClick();
+      return;
+    }
+    if (num === nextToClick) {
+      cell.classList.add('chimp-correct');
+      cell.textContent = num;
+      nextToClick++;
+      if (nextToClick > numCount) {
+        // Level complete
+        numCount++;
+        setEl('chimpLevel', numCount);
+        setTimeout(() => buildRound(), 600);
+      }
+    } else {
+      cell.classList.add('chimp-wrong');
+      cell.textContent = num;
+      wrongClick();
+    }
+  }
+
+  function wrongClick() {
+    lives--;
+    renderLives();
+    if (lives <= 0) {
+      setTimeout(() => gameOver(), 500);
+    } else {
+      showToast('Wrong! ' + lives + ' lives left', 'error');
+      setTimeout(() => buildRound(), 800);
+    }
+  }
+
+  function gameOver() {
+    phase = 'idle';
+    const reached = numCount - 1;
+    const best = Math.max(reached, Storage.get('chimp_best', 0));
+    Storage.set('chimp_best', best);
+    results.classList.remove('hidden');
+    setEl('chimpFinalLevel', reached); setEl('chimpBestDisplay', best);
+    applyRating(document.getElementById('chimpRating'), 'chimp', reached);
+    Storage.addHistory('chimp', reached);
+    Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
+    const xpEarned = reached >= 12 ? 50 : reached >= 9 ? 40 : reached >= 7 ? 25 : reached >= 5 ? 15 : 10;
+    XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success');
+    setupShare('chimpShare', 'chimpShareBox', 'chimpShareText', 'chimpCopyBtn',
+      `🐒 I reached ${reached} numbers in the Chimp Test on ReflexZone! reflexzone.io`);
+    document.getElementById('chimpRetry').onclick = () => {
+      results.classList.add('hidden'); numCount = 4; lives = 3;
+      setEl('chimpLevel', numCount); renderLives();
+      arena.innerHTML = `<div class="chimp-start-overlay" id="chimpStartOverlay">
+        <div class="chimp-start-icon">🐒</div><div class="chimp-start-title">Chimp Test</div>
+        <div class="chimp-start-sub">Numbers flash on screen.<br/>Click them in ascending order.</div>
+        <button class="btn-primary btn-large" id="chimpStartBtn">Begin</button></div>`;
+      document.getElementById('chimpStartBtn').onclick = () => { arena.innerHTML = ''; buildRound(); };
+    };
+  }
+
+  function init() {
+    document.getElementById('chimpStartBtn')?.addEventListener('click', () => { arena.innerHTML = ''; buildRound(); });
+    arena.addEventListener('click', handleCellClick);
+  }
+
+  return { init };
+})();
+
+/* ============================================================
+   TEST 8: COLOR REFLEX (NEW)
+   ============================================================ */
+
+const ColorReflex = (() => {
+  const COLORS = [
+    { name: 'RED', hex: '#ff4757' },
+    { name: 'BLUE', hex: '#00c8ff' },
+    { name: 'GREEN', hex: '#00ffaa' },
+    { name: 'YELLOW', hex: '#ffd700' },
+    { name: 'PINK', hex: '#ff6eb4' },
+    { name: 'ORANGE', hex: '#ff6a00' }
+  ];
+
+  let score = 0, streak = 0, bestStreak = 0, correct = 0, wrong = 0, timeLeft = 30, timerInterval = null, running = false;
+  let currentWord = '', inkColor = '';
+  const game = document.getElementById('colorGame');
+  const results = document.getElementById('colorResults');
+
+  function generateRound() {
+    // Pick word and ink color - ensure they're different (Stroop effect)
+    const wordIdx = Math.floor(Math.random() * COLORS.length);
+    let inkIdx;
+    do { inkIdx = Math.floor(Math.random() * COLORS.length); } while (inkIdx === wordIdx && Math.random() < 0.7);
+    currentWord = COLORS[wordIdx].name;
+    inkColor = COLORS[inkIdx].hex;
+
+    const wordEl = document.getElementById('colorWordDisplay');
+    if (wordEl) {
+      wordEl.textContent = currentWord;
+      wordEl.style.color = inkColor;
+    }
+
+    // Build 4 option buttons (always include correct answer)
+    const correctColor = COLORS.find(c => c.name === currentWord);
+    const others = COLORS.filter(c => c.name !== currentWord);
+    const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
+    const options = [...shuffled, correctColor].sort(() => Math.random() - 0.5);
+
+    const btns = document.getElementById('colorButtons');
+    if (btns) {
+      btns.innerHTML = options.map(c =>
+        `<button class="color-btn" data-color="${c.name}" style="background:${c.hex}">${c.name}</button>`
+      ).join('');
+    }
+  }
+
+  function handleAnswer(e) {
+    const btn = e.target.closest('.color-btn');
+    if (!btn || !running) return;
+    const chosen = btn.dataset.color;
+    if (chosen === currentWord) {
+      // Correct
+      correct++;
+      streak++;
+      if (streak > bestStreak) bestStreak = streak;
+      score += 1 + Math.floor(streak / 3);
+      btn.classList.add('color-btn-correct');
+      setEl('colorScore', score); setEl('colorStreak', streak); setEl('colorBestStreak', bestStreak);
+      setTimeout(() => generateRound(), 150);
+    } else {
+      // Wrong
+      wrong++;
+      streak = 0;
+      score = Math.max(0, score - 1);
+      btn.classList.add('color-btn-wrong');
+      // Flash correct
+      document.querySelectorAll('.color-btn').forEach(b => {
+        if (b.dataset.color === currentWord) b.classList.add('color-btn-correct');
+      });
+      setEl('colorScore', score); setEl('colorStreak', streak);
+      setTimeout(() => generateRound(), 400);
+    }
+  }
+
+  function startGame() {
+    score = 0; streak = 0; bestStreak = 0; correct = 0; wrong = 0; timeLeft = 30; running = true;
+    document.getElementById('colorStartOverlay')?.classList.add('hidden');
+    game.classList.remove('hidden');
+    setEl('colorScore', 0); setEl('colorTimer', 30); setEl('colorStreak', 0); setEl('colorBestStreak', 0);
+    generateRound();
+    timerInterval = setInterval(() => {
+      timeLeft--; setEl('colorTimer', timeLeft);
+      if (timeLeft <= 0) finishGame();
+    }, 1000);
+  }
+
+  function finishGame() {
+    running = false; clearInterval(timerInterval);
+    game.classList.add('hidden');
+    results.classList.remove('hidden');
+    setEl('colorFinalScore', score); applyRating(document.getElementById('colorRating'), 'color', score);
+    setEl('colorResCorrect', correct); setEl('colorResWrong', wrong); setEl('colorResBestStreak', bestStreak);
+    Storage.addHistory('color', score);
+    Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
+    const xpEarned = score >= 25 ? 50 : score >= 18 ? 35 : score >= 12 ? 25 : score >= 6 ? 15 : 10;
+    XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success');
+    setupShare('colorShare', 'colorShareBox', 'colorShareText', 'colorCopyBtn',
+      `🎨 I scored ${score} in Color Reflex on ReflexZone! (${correct} correct, best streak ${bestStreak}) reflexzone.io`);
+    document.getElementById('colorRetry').onclick = () => {
+      results.classList.add('hidden');
+      document.getElementById('colorStartOverlay')?.classList.remove('hidden');
+      setEl('colorScore', 0); setEl('colorTimer', 30); setEl('colorStreak', 0); setEl('colorBestStreak', 0);
+    };
+  }
+
+  function init() {
+    document.getElementById('colorStartBtn')?.addEventListener('click', startGame);
+    document.getElementById('colorButtons')?.addEventListener('click', handleAnswer);
+    document.getElementById('colorArena')?.addEventListener('click', (e) => {
+      if (running) handleAnswer(e);
+    });
+  }
+
+  return { init };
 })();
 
 /* ============================================================
@@ -1134,48 +1523,38 @@ const TypingTest = (() => {
 
 function refreshDashboard() {
   updateHUD();
-
-  const tests = ['reaction', 'cps', 'aim', 'memory', 'typing'];
+  const tests = ['reaction', 'cps', 'aim', 'memory', 'typing', 'number', 'chimp', 'color'];
+  const units = { reaction: 'ms', cps: ' CPS', aim: ' pts', memory: '', typing: ' WPM', number: ' digits', chimp: '', color: ' pts' };
+  const prefixes = { memory: 'Level ', chimp: 'Level ' };
 
   tests.forEach(test => {
     const hist = Storage.get(test + '_hist', []);
     const best = Storage.get(test + '_best', null);
-
-    // Determine unit
-    const units = { reaction: 'ms', cps: ' CPS', aim: ' pts', memory: '', typing: ' WPM' };
-    const prefixes = { memory: 'Level ' };
     const unit = units[test] || '';
     const prefix = prefixes[test] || '';
 
-    // Best
     const bestEl = document.getElementById('dash' + capitalize(test) + 'Best');
     if (bestEl) bestEl.textContent = best !== null ? prefix + best + unit : '—';
 
-    // Average
     const avgEl = document.getElementById('dash' + capitalize(test) + 'Avg');
     if (avgEl && hist.length > 0) {
       const avg = hist.reduce((a, b) => a + b.score, 0) / hist.length;
       avgEl.textContent = 'Avg: ' + prefix + (test === 'reaction' ? Math.round(avg) : avg.toFixed(1)) + unit;
     }
 
-    // History bars
     const histEl = document.getElementById('dash' + capitalize(test) + 'History');
     if (histEl && hist.length > 0) {
       const scores = hist.map(h => h.score);
-      const maxVal = Math.max(...scores);
-      const minVal = Math.min(...scores);
+      const maxVal = Math.max(...scores), minVal = Math.min(...scores);
       const range = maxVal - minVal || 1;
       histEl.innerHTML = scores.map(s => {
-        const frac = test === 'reaction'
-          ? 1 - (s - minVal) / range // Lower is better for reaction
-          : (s - minVal) / range;
+        const frac = test === 'reaction' ? 1 - (s - minVal) / range : (s - minVal) / range;
         const h = Math.max(4, Math.round(frac * 30));
         return `<div class="hist-bar" style="height:${h}px" title="${s}${unit}"></div>`;
       }).join('');
     }
   });
 
-  // Total XP and test count
   setEl('dashTotalXp', XPSystem.getXP() + ' XP');
   setEl('dashTestCount', Storage.get('tests_count', 0) + ' tests completed');
 }
@@ -1189,12 +1568,10 @@ function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 document.getElementById('resetAllData')?.addEventListener('click', () => {
   if (!confirm('Reset all your data? This cannot be undone.')) return;
   ['xp', 'streak', 'last_visit', 'tests_count',
-   'reaction_best', 'cps_best', 'aim_best', 'memory_best', 'typing_best',
-   'reaction_hist', 'cps_hist', 'aim_hist', 'memory_hist', 'typing_hist'
+   'reaction_best', 'cps_best', 'aim_best', 'memory_best', 'typing_best', 'number_best', 'chimp_best', 'color_best',
+   'reaction_hist', 'cps_hist', 'aim_hist', 'memory_hist', 'typing_hist', 'number_hist', 'chimp_hist', 'color_hist'
   ].forEach(k => localStorage.removeItem('rz_' + k));
-  updateHUD();
-  updateHomeBests();
-  refreshDashboard();
+  updateHUD(); updateHomeBests(); refreshDashboard();
   showToast('All data reset.', '');
 });
 
@@ -1203,27 +1580,23 @@ document.getElementById('resetAllData')?.addEventListener('click', () => {
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Run streak check on load
   StreakSystem.check();
-
-  // Update HUD
   updateHUD();
   updateHomeBests();
-
-  // Init navigation
   initNavigation();
-
-  // Init all tests
+  initThemes();
   ReactionTest.init();
   CPSTest.init();
   AimTrainer.init();
   MemoryTest.init();
   TypingTest.init();
+  NumberMemory.init();
+  ChimpTest.init();
+  ColorReflex.init();
 
-  // Keyboard shortcut: Escape → go home
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') navigateTo('home');
   });
 
-  console.log('%c⚡ ReflexZone loaded', 'color: #00ffaa; font-size: 16px; font-weight: bold;');
+  console.log('%c⚡ ReflexZone v2 loaded', 'color: #00ffaa; font-size: 16px; font-weight: bold;');
 });
