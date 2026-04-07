@@ -1,6 +1,6 @@
 /* ============================================================
-   REFLEXZONE — HUMAN BENCHMARK PLATFORM
-   script.js — Full Application Logic (Enhanced)
+   STATDUNGEON — HUMAN STAT TESTING PLATFORM
+   script.js — Full Application Logic
    ============================================================ */
 
 'use strict';
@@ -24,7 +24,6 @@ const REACTION_DELAY = {
 
 const WORD_BANKS = {
   words: [
-    // Common 200 words
     "the","be","to","of","and","a","in","that","have","it","for","not","on","with","he","as","you",
     "do","at","this","but","his","by","from","they","we","say","her","she","or","an","will","my",
     "one","all","would","there","their","what","so","up","out","if","about","who","get","which",
@@ -86,6 +85,203 @@ const WORD_BANKS = {
     "export default class Component extends Base {}"
   ]
 };
+
+/* ============================================================
+   DUNGEON CANVAS BACKGROUND
+   ============================================================ */
+
+const DungeonCanvas = (() => {
+  let canvas, ctx, W, H, animId;
+  let torches = [];
+  let particles = [];
+  let time = 0;
+  let active = false;
+
+  // Dungeon color palette
+  const STONE_COLORS = [
+    '#1a1208', '#1e1508', '#221808', '#1c1306', '#201608'
+  ];
+  const GROUT_COLOR = '#0e0a04';
+  const TORCH_COLOR = '#c89020';
+
+  const TILE_W = 48;
+  const TILE_H = 48;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    placeTorches();
+  }
+
+  function placeTorches() {
+    torches = [];
+    const cols = Math.ceil(W / (TILE_W * 6)) + 1;
+    const rows = Math.ceil(H / (TILE_H * 5)) + 1;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        torches.push({
+          x: c * TILE_W * 6 + TILE_W * 3,
+          y: r * TILE_H * 5 + TILE_H * 1.5,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.04 + Math.random() * 0.03,
+          brightness: 0.6 + Math.random() * 0.4
+        });
+      }
+    }
+  }
+
+  function drawStoneFloor() {
+    const cols = Math.ceil(W / TILE_W) + 2;
+    const rows = Math.ceil(H / TILE_H) + 2;
+    ctx.fillStyle = GROUT_COLOR;
+    ctx.fillRect(0, 0, W, H);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const offset = (r % 2 === 0) ? 0 : TILE_W / 2;
+        const x = c * TILE_W - offset;
+        const y = r * TILE_H;
+        // Stone base
+        const colorIdx = (r * 7 + c * 13) % STONE_COLORS.length;
+        ctx.fillStyle = STONE_COLORS[colorIdx];
+        ctx.fillRect(x + 1, y + 1, TILE_W - 2, TILE_H - 2);
+        // Subtle pixel noise on tile
+        ctx.fillStyle = 'rgba(255,200,100,0.015)';
+        for (let px = 0; px < 3; px++) {
+          const nx = x + 2 + ((r * 11 + c * 7 + px * 5) % (TILE_W - 4));
+          const ny = y + 2 + ((r * 5 + c * 13 + px * 9) % (TILE_H - 4));
+          ctx.fillRect(nx, ny, 2, 2);
+        }
+        // Worn corner marks (pixel art style)
+        ctx.fillStyle = 'rgba(255,220,100,0.03)';
+        ctx.fillRect(x + 2, y + 2, 4, 4);
+        ctx.fillRect(x + TILE_W - 6, y + 2, 4, 4);
+        ctx.fillRect(x + 2, y + TILE_H - 6, 4, 4);
+        ctx.fillRect(x + TILE_W - 6, y + TILE_H - 6, 4, 4);
+      }
+    }
+  }
+
+  function spawnParticle(torch) {
+    particles.push({
+      x: torch.x + (Math.random() - 0.5) * 8,
+      y: torch.y - 8,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: -(0.4 + Math.random() * 0.8),
+      life: 1,
+      decay: 0.025 + Math.random() * 0.02,
+      size: 2 + Math.random() * 3
+    });
+  }
+
+  function drawTorch(torch) {
+    const flicker = Math.sin(time * torch.speed + torch.phase) * 0.3 +
+                    Math.sin(time * torch.speed * 2.3 + torch.phase * 1.7) * 0.15;
+    const brightness = torch.brightness + flicker;
+    const radius = 80 + flicker * 20;
+
+    // Torch glow
+    const grd = ctx.createRadialGradient(torch.x, torch.y, 2, torch.x, torch.y, radius);
+    grd.addColorStop(0, `rgba(200,160,32,${0.14 * brightness})`);
+    grd.addColorStop(0.3, `rgba(160,100,20,${0.06 * brightness})`);
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(torch.x, torch.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Torch sconce (pixel art style - simple rectangles)
+    ctx.fillStyle = '#4a3010';
+    ctx.fillRect(torch.x - 4, torch.y, 8, 14);
+    ctx.fillStyle = '#6a4818';
+    ctx.fillRect(torch.x - 3, torch.y + 1, 6, 11);
+
+    // Flame
+    const flameH = 10 + flicker * 4;
+    ctx.fillStyle = `rgba(255,220,60,${0.9 + flicker * 0.1})`;
+    ctx.fillRect(torch.x - 3, torch.y - flameH, 6, flameH);
+    ctx.fillStyle = `rgba(255,140,20,${0.8 + flicker * 0.15})`;
+    ctx.fillRect(torch.x - 2, torch.y - flameH + 2, 4, flameH - 3);
+    ctx.fillStyle = `rgba(255,255,200,${0.6 + flicker * 0.2})`;
+    ctx.fillRect(torch.x - 1, torch.y - flameH + 4, 2, flameH - 6);
+
+    // Spawn embers
+    if (Math.random() < 0.15) spawnParticle(torch);
+  }
+
+  function drawParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.01;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      ctx.fillStyle = `rgba(255,${100 + p.life * 120},20,${p.life * 0.8})`;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+  }
+
+  function drawWallTop() {
+    // Dark stone wall at the very top
+    ctx.fillStyle = '#100c04';
+    ctx.fillRect(0, 0, W, TILE_H * 0.5);
+    // Wall border bricks
+    const brickW = 64, brickH = 16;
+    ctx.fillStyle = '#1a1408';
+    for (let c = -1; c < Math.ceil(W / brickW) + 1; c++) {
+      const offset = (0 % 2 === 0) ? 0 : brickW / 2;
+      ctx.fillRect(c * brickW - offset + 1, 4, brickW - 2, brickH - 2);
+    }
+    // Wall shadow
+    const wallGrd = ctx.createLinearGradient(0, 0, 0, TILE_H * 2);
+    wallGrd.addColorStop(0, 'rgba(0,0,0,0.8)');
+    wallGrd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = wallGrd;
+    ctx.fillRect(0, 0, W, TILE_H * 2);
+  }
+
+  function drawVignette() {
+    const grd = ctx.createRadialGradient(W/2, H/2, H * 0.2, W/2, H/2, H * 0.9);
+    grd.addColorStop(0, 'rgba(0,0,0,0)');
+    grd.addColorStop(1, 'rgba(0,0,0,0.7)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function loop() {
+    if (!active) return;
+    time++;
+    ctx.clearRect(0, 0, W, H);
+    drawStoneFloor();
+    drawWallTop();
+    torches.forEach(t => drawTorch(t));
+    drawParticles();
+    drawVignette();
+    animId = requestAnimationFrame(loop);
+  }
+
+  function start() {
+    active = true;
+    if (!animId) loop();
+  }
+
+  function stop() {
+    active = false;
+    cancelAnimationFrame(animId);
+    animId = null;
+    if (ctx) ctx.clearRect(0, 0, W, H);
+  }
+
+  function init() {
+    canvas = document.getElementById('dungeonCanvas');
+    if (!canvas) return;
+    ctx = canvas.getContext('2d');
+    resize();
+    window.addEventListener('resize', () => { resize(); });
+  }
+
+  return { init, start, stop };
+})();
 
 /* ============================================================
    THEME SYSTEM
@@ -205,6 +401,25 @@ const THEMES = {
     '--orb1': 'rgba(0,112,243,0.06)',
     '--orb2': 'rgba(0,170,255,0.04)',
     '--orb3': 'rgba(136,0,255,0.04)'
+  },
+  dungeon: {
+    '--bg-base': '#0e0a05',
+    '--bg-card': '#1a1208',
+    '--bg-card2': '#221808',
+    '--bg-hover': '#2e2010',
+    '--border': 'rgba(180,140,60,0.2)',
+    '--border-glow': 'rgba(200,160,60,0.5)',
+    '--accent': '#c8a020',
+    '--accent2': '#e8c060',
+    '--accent3': '#cc4422',
+    '--accent4': '#8060a0',
+    '--accent-dim': 'rgba(200,160,32,0.15)',
+    '--text-primary': '#f0e8d0',
+    '--text-secondary': '#9a8060',
+    '--text-muted': '#5a4030',
+    '--orb1': 'rgba(200,160,32,0.08)',
+    '--orb2': 'rgba(180,100,20,0.05)',
+    '--orb3': 'rgba(120,80,160,0.04)'
   }
 };
 
@@ -213,7 +428,7 @@ function applyTheme(themeName) {
   if (!theme) return;
   const root = document.documentElement;
   Object.entries(theme).forEach(([key, val]) => root.style.setProperty(key, val));
-  // Update orb colors
+
   const orb1 = document.querySelector('.orb-1');
   const orb2 = document.querySelector('.orb-2');
   const orb3 = document.querySelector('.orb-3');
@@ -224,6 +439,16 @@ function applyTheme(themeName) {
   document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
   const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeName}"]`);
   if (activeBtn) activeBtn.classList.add('active');
+
+  // Dungeon canvas toggle
+  document.body.className = document.body.className.replace(/theme-\S+/g, '').trim();
+  document.body.classList.add('theme-' + themeName);
+
+  if (themeName === 'dungeon') {
+    DungeonCanvas.start();
+  } else {
+    DungeonCanvas.stop();
+  }
 
   Storage.set('theme', themeName);
 }
@@ -571,7 +796,7 @@ const ReactionTest = (() => {
   function startRound() {
     setState('ready');
     if (reactMsg) reactMsg.textContent = 'WAIT...';
-    if (reactSub) reactSub.textContent = 'Don\'t click yet!';
+    if (reactSub) reactSub.textContent = "Don't click yet!";
     const diff = document.getElementById('reactionDifficulty')?.value || 'normal';
     const range = REACTION_DELAY[diff];
     const delay = range.min + Math.random() * (range.max - range.min);
@@ -635,7 +860,7 @@ const ReactionTest = (() => {
     XPSystem.addXP(xpEarned);
     showToast(`+${xpEarned} XP earned!`, 'success');
     setupShare('reactionShare', 'reactionShareBox', 'reactionShareText', 'reactionCopyBtn',
-      `⚡ I got ${best}ms reaction time on ReflexZone! Can you beat me? reflexzone.io`);
+      `⚡ I got ${best}ms reaction time on StatDungeon! Can you beat me? statdungeon.io`);
     document.getElementById('reactionRetry').onclick = () => {
       results.classList.add('hidden'); setState('idle');
       if (reactMsg) reactMsg.textContent = 'Click to Start';
@@ -714,7 +939,7 @@ const CPSTest = (() => {
     XPSystem.addXP(xpEarned);
     showToast(`+${xpEarned} XP earned!`, 'success');
     setupShare('cpsShare', 'cpsShareBox', 'cpsShareText', 'cpsCopyBtn',
-      `🖱 I got ${finalCps.toFixed(2)} CPS (${clicks} clicks in ${duration}s) on ReflexZone! reflexzone.io`);
+      `🖱 I got ${finalCps.toFixed(2)} CPS (${clicks} clicks in ${duration}s) on StatDungeon! statdungeon.io`);
     document.getElementById('cpsRetry').onclick = () => {
       results.classList.add('hidden');
       if (btnText) btnText.textContent = 'CLICK TO START';
@@ -853,7 +1078,7 @@ const AimTrainer = (() => {
     XPSystem.addXP(xpEarned);
     showToast(`+${xpEarned} XP earned!`, 'success');
     setupShare('aimShare', 'aimShareBox', 'aimShareText', 'aimCopyBtn',
-      `🎯 I scored ${score} pts (${accuracy}% accuracy) in Aim Trainer on ReflexZone! reflexzone.io`);
+      `🎯 I scored ${score} pts (${accuracy}% accuracy) in Aim Trainer on StatDungeon! statdungeon.io`);
     document.getElementById('aimRetry').onclick = () => {
       results.classList.add('hidden');
       const overlay = document.createElement('div');
@@ -950,7 +1175,7 @@ const MemoryTest = (() => {
     const xpEarned = reached >= 10 ? 50 : reached >= 8 ? 40 : reached >= 6 ? 25 : reached >= 4 ? 15 : 10;
     XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success'); setEl('memBest', best);
     setupShare('memShare', 'memShareBox', 'memShareText', 'memCopyBtn',
-      `🧠 I reached Level ${reached} in Memory Test on ReflexZone! Can you beat me? reflexzone.io`);
+      `🧠 I reached Level ${reached} in Memory Test on StatDungeon! Can you beat me? statdungeon.io`);
     document.getElementById('memRetry').onclick = () => {
       results.classList.add('hidden'); if (controls) controls.classList.remove('hidden');
       level = 1; setEl('memLevel', 1); setEl('memMsg', 'Watch the sequence...');
@@ -973,7 +1198,7 @@ const MemoryTest = (() => {
 })();
 
 /* ============================================================
-   TEST 5: TYPING SPEED (Enhanced with random words)
+   TEST 5: TYPING SPEED
    ============================================================ */
 
 const TypingTest = (() => {
@@ -986,10 +1211,9 @@ const TypingTest = (() => {
 
   function getWordList() {
     const mode = document.getElementById('typingMode')?.value || 'words';
-    if (mode === 'sentences') return null; // sentence mode
+    if (mode === 'sentences') return null;
     if (mode === 'numbers') return WORD_BANKS.numbers[Math.floor(Math.random() * WORD_BANKS.numbers.length)].split(' ');
     if (mode === 'code') return WORD_BANKS.code[Math.floor(Math.random() * WORD_BANKS.code.length)].split(' ');
-    // Random words - pick 80 random words
     const bank = WORD_BANKS.words;
     const picked = [];
     for (let i = 0; i < 80; i++) picked.push(bank[Math.floor(Math.random() * bank.length)]);
@@ -1008,17 +1232,13 @@ const TypingTest = (() => {
   function setupTest() {
     duration = parseInt(document.getElementById('typingDuration')?.value || '60');
     const mode = document.getElementById('typingMode')?.value || 'words';
-
     totalTyped = 0; errors = 0; wordIndex = 0; charIndex = 0;
     started = false; finished = false;
-
     if (mode === 'sentences') {
-      // Sentence mode: character by character
       currentWords = getSentenceText().split('');
     } else {
       currentWords = getWordList();
     }
-
     if (inputEl) { inputEl.value = ''; inputEl.disabled = false; }
     if (timerInterval) clearInterval(timerInterval);
     setEl('typeTimer', duration); setEl('typeWpm', 0); setEl('typeAccuracy', '100%'); setEl('typeErrors', 0);
@@ -1029,9 +1249,7 @@ const TypingTest = (() => {
   function renderWordPrompt() {
     if (!promptEl) return;
     const mode = document.getElementById('typingMode')?.value || 'words';
-
     if (mode === 'sentences') {
-      // Char-by-char for sentences
       const text = currentWords.join('');
       promptEl.innerHTML = text.split('').map((ch, i) => {
         let cls = i < charIndex ? 'char-correct' : i === charIndex ? 'char-current' : 'char-pending';
@@ -1039,12 +1257,9 @@ const TypingTest = (() => {
       }).join('');
       return;
     }
-
-    // Word-by-word rendering
     promptEl.innerHTML = currentWords.map((word, wi) => {
       if (wi < wordIndex) return `<span class="word-done">${word}</span> `;
       if (wi === wordIndex) {
-        // Current word with char highlighting
         return '<span class="word-current">' + word.split('').map((ch, ci) => {
           let cls = ci < charIndex ? 'char-correct' : ci === charIndex ? 'char-current' : 'char-pending';
           return `<span class="${cls}">${ch}</span>`;
@@ -1052,8 +1267,6 @@ const TypingTest = (() => {
       }
       return `<span class="word-pending">${word}</span> `;
     }).join('');
-
-    // Auto-scroll to current word
     const currentWordEl = promptEl.querySelector('.word-current');
     if (currentWordEl) {
       const topOffset = currentWordEl.offsetTop;
@@ -1071,7 +1284,6 @@ const TypingTest = (() => {
   function handleInput(e) {
     if (finished) return;
     const mode = document.getElementById('typingMode')?.value || 'words';
-
     if (!started) {
       started = true; startTime = performance.now();
       let timeLeft = duration;
@@ -1080,9 +1292,7 @@ const TypingTest = (() => {
         if (timeLeft <= 0) finishTest();
       }, 1000);
     }
-
     const val = inputEl.value;
-
     if (mode === 'sentences') {
       const lastChar = val[val.length - 1];
       const expected = currentWords[charIndex];
@@ -1091,19 +1301,14 @@ const TypingTest = (() => {
       if (val.length > 40) inputEl.value = '';
       if (charIndex >= currentWords.length) { currentWords = getSentenceText().split(''); charIndex = 0; inputEl.value = ''; }
     } else {
-      // Word mode: space advances to next word
       if (val.endsWith(' ')) {
         const typed = val.trim();
         const expected = currentWords[wordIndex] || '';
         totalTyped += expected.length + 1;
-        // Count errors
         for (let i = 0; i < Math.max(typed.length, expected.length); i++) {
           if (typed[i] !== expected[i]) errors++;
         }
-        wordIndex++;
-        charIndex = 0;
-        inputEl.value = '';
-        // Load more words if running low
+        wordIndex++; charIndex = 0; inputEl.value = '';
         if (wordIndex >= currentWords.length - 10) {
           const bank = WORD_BANKS.words;
           for (let i = 0; i < 20; i++) currentWords.push(bank[Math.floor(Math.random() * bank.length)]);
@@ -1112,7 +1317,6 @@ const TypingTest = (() => {
         charIndex = val.length;
       }
     }
-
     const acc = totalTyped > 0 ? Math.round((1 - errors / totalTyped) * 100) : 100;
     setEl('typeAccuracy', acc + '%'); setEl('typeErrors', errors); setEl('typeWpm', calcWPM());
     renderWordPrompt();
@@ -1132,7 +1336,7 @@ const TypingTest = (() => {
     const xpEarned = wpm >= 130 ? 50 : wpm >= 90 ? 35 : wpm >= 60 ? 25 : wpm >= 35 ? 15 : 10;
     XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success');
     setupShare('typeShare', 'typeShareBox', 'typeShareText', 'typeCopyBtn',
-      `⌨️ I typed ${wpm} WPM with ${acc}% accuracy on ReflexZone! reflexzone.io`);
+      `⌨️ I typed ${wpm} WPM with ${acc}% accuracy on StatDungeon! statdungeon.io`);
     document.getElementById('typeRetry').onclick = () => { setupTest(); if (inputEl) inputEl.focus(); };
   }
 
@@ -1148,7 +1352,7 @@ const TypingTest = (() => {
 })();
 
 /* ============================================================
-   TEST 6: NUMBER MEMORY (NEW)
+   TEST 6: NUMBER MEMORY
    ============================================================ */
 
 const NumberMemory = (() => {
@@ -1167,45 +1371,30 @@ const NumberMemory = (() => {
   async function startRound() {
     if (inputArea) inputArea.classList.add('hidden');
     if (results) results.classList.add('hidden');
-
     currentNumber = generateNumber(level + 2);
     phase = 'showing';
-
-    // Show the number with countdown
     const showDuration = Math.min(1000 + (level + 2) * 500, 6000);
-
     displayArea.innerHTML = `
       <div class="num-flash-wrapper">
         <div class="num-countdown" id="numCountdown">GET READY</div>
         <div class="num-flash-number hidden" id="numFlashNumber">${currentNumber}</div>
         <div class="num-timer-bar"><div class="num-timer-fill" id="numTimerFill"></div></div>
       </div>`;
-
     await sleep(800);
     const countEl = document.getElementById('numCountdown');
     const numEl = document.getElementById('numFlashNumber');
     const fillEl = document.getElementById('numTimerFill');
-
     if (countEl) countEl.classList.add('hidden');
     if (numEl) numEl.classList.remove('hidden');
-
-    // Animate timer bar
     if (fillEl) {
       fillEl.style.transition = `width ${showDuration}ms linear`;
       fillEl.style.width = '100%';
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => { fillEl.style.width = '0%'; });
-      });
+      requestAnimationFrame(() => { requestAnimationFrame(() => { fillEl.style.width = '0%'; }); });
     }
-
     await sleep(showDuration);
-
-    // Hide number, show input
     if (numEl) numEl.textContent = '?'.repeat(currentNumber.length);
     phase = 'input';
-
     displayArea.innerHTML = `<div class="num-flash-wrapper"><div class="num-flash-number blurred">${'?'.repeat(currentNumber.length)}</div></div>`;
-
     if (inputArea) {
       inputArea.classList.remove('hidden');
       const numInput = document.getElementById('numInput');
@@ -1217,16 +1406,13 @@ const NumberMemory = (() => {
     if (phase !== 'input') return;
     const inputEl = document.getElementById('numInput');
     const typed = (inputEl?.value || '').trim();
-
     if (typed === currentNumber) {
-      // Correct!
       level++;
       setEl('numLevel', level);
       showToast('✓ Correct! Next level...', 'success');
       displayArea.innerHTML = `<div class="num-flash-wrapper"><div class="num-correct-flash">✓ ${currentNumber}</div></div>`;
       setTimeout(() => startRound(), 1000);
     } else {
-      // Wrong
       displayArea.innerHTML = `<div class="num-flash-wrapper">
         <div class="num-wrong-flash">✗ ${currentNumber}</div>
         <div class="num-wrong-sub">You typed: ${typed || '(nothing)'}</div>
@@ -1237,26 +1423,20 @@ const NumberMemory = (() => {
   }
 
   function gameOver() {
-    const reached = level + 1; // digits memorized = level + 2 - 1 = level + 1
     const digits = level + 1;
     const best = Math.max(digits, Storage.get('number_best', 0));
     Storage.set('number_best', best);
-
     results.classList.remove('hidden');
     displayArea.innerHTML = `<div class="num-flash-wrapper"><div class="num-start-icon">🔢</div></div>`;
-
     setEl('numFinalLevel', digits);
     applyRating(document.getElementById('numRating'), 'number', digits);
     setEl('numBestDisplay', best);
-
     Storage.addHistory('number', digits);
     Storage.set('tests_count', (Storage.get('tests_count', 0) + 1));
     const xpEarned = digits >= 12 ? 50 : digits >= 9 ? 35 : digits >= 7 ? 25 : digits >= 5 ? 15 : 10;
     XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success');
-
     setupShare('numShare', 'numShareBox', 'numShareText', 'numCopyBtn',
-      `🔢 I memorized a ${digits}-digit number on ReflexZone! Can you beat me? reflexzone.io`);
-
+      `🔢 I memorized a ${digits}-digit number on StatDungeon! Can you beat me? statdungeon.io`);
     document.getElementById('numRetry').onclick = () => {
       results.classList.add('hidden');
       level = 1; setEl('numLevel', 1);
@@ -1274,23 +1454,20 @@ const NumberMemory = (() => {
   function init() {
     document.getElementById('numStartBtn')?.addEventListener('click', () => startRound());
     document.getElementById('numSubmitBtn')?.addEventListener('click', submitAnswer);
-    document.getElementById('numInput')?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submitAnswer();
-    });
+    document.getElementById('numInput')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAnswer(); });
   }
 
   return { init };
 })();
 
 /* ============================================================
-   TEST 7: CHIMP TEST (NEW)
+   TEST 7: CHIMP TEST
    ============================================================ */
 
 const ChimpTest = (() => {
   let numCount = 4, lives = 3, nextToClick = 1, numbers = [], phase = 'idle';
   const arena = document.getElementById('chimpArena');
   const results = document.getElementById('chimpResults');
-
   const GRID_W = 5, GRID_H = 4;
 
   function renderLives() {
@@ -1303,11 +1480,8 @@ const ChimpTest = (() => {
     const cells = new Set();
     while (cells.size < numCount) cells.add(Math.floor(Math.random() * GRID_W * GRID_H));
     const positions = [...cells];
-
-    // Create grid
     let gridHTML = '<div class="chimp-grid">';
     const numArr = Array.from({length: numCount}, (_, i) => i + 1).sort(() => Math.random() - 0.5);
-
     for (let i = 0; i < GRID_W * GRID_H; i++) {
       const posIdx = positions.indexOf(i);
       if (posIdx >= 0) {
@@ -1320,8 +1494,6 @@ const ChimpTest = (() => {
     }
     gridHTML += '</div>';
     arena.innerHTML = gridHTML;
-
-    // After 1.5s, hide numbers
     setTimeout(() => {
       if (phase !== 'showing') return;
       arena.querySelectorAll('.chimp-cell.has-num').forEach(el => el.textContent = '');
@@ -1334,21 +1506,12 @@ const ChimpTest = (() => {
     const cell = e.target.closest('.chimp-cell');
     if (!cell || phase !== 'clicking') return;
     const num = parseInt(cell.dataset.num);
-    if (isNaN(num)) {
-      // Clicked empty cell
-      wrongClick();
-      return;
-    }
+    if (isNaN(num)) { wrongClick(); return; }
     if (num === nextToClick) {
       cell.classList.add('chimp-correct');
       cell.textContent = num;
       nextToClick++;
-      if (nextToClick > numCount) {
-        // Level complete
-        numCount++;
-        setEl('chimpLevel', numCount);
-        setTimeout(() => buildRound(), 600);
-      }
+      if (nextToClick > numCount) { numCount++; setEl('chimpLevel', numCount); setTimeout(() => buildRound(), 600); }
     } else {
       cell.classList.add('chimp-wrong');
       cell.textContent = num;
@@ -1357,14 +1520,9 @@ const ChimpTest = (() => {
   }
 
   function wrongClick() {
-    lives--;
-    renderLives();
-    if (lives <= 0) {
-      setTimeout(() => gameOver(), 500);
-    } else {
-      showToast('Wrong! ' + lives + ' lives left', 'error');
-      setTimeout(() => buildRound(), 800);
-    }
+    lives--; renderLives();
+    if (lives <= 0) { setTimeout(() => gameOver(), 500); }
+    else { showToast('Wrong! ' + lives + ' lives left', 'error'); setTimeout(() => buildRound(), 800); }
   }
 
   function gameOver() {
@@ -1380,7 +1538,7 @@ const ChimpTest = (() => {
     const xpEarned = reached >= 12 ? 50 : reached >= 9 ? 40 : reached >= 7 ? 25 : reached >= 5 ? 15 : 10;
     XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success');
     setupShare('chimpShare', 'chimpShareBox', 'chimpShareText', 'chimpCopyBtn',
-      `🐒 I reached ${reached} numbers in the Chimp Test on ReflexZone! reflexzone.io`);
+      `🐒 I reached ${reached} numbers in the Chimp Test on StatDungeon! statdungeon.io`);
     document.getElementById('chimpRetry').onclick = () => {
       results.classList.add('hidden'); numCount = 4; lives = 3;
       setEl('chimpLevel', numCount); renderLives();
@@ -1401,7 +1559,7 @@ const ChimpTest = (() => {
 })();
 
 /* ============================================================
-   TEST 8: COLOR REFLEX (NEW)
+   TEST 8: COLOR REFLEX
    ============================================================ */
 
 const ColorReflex = (() => {
@@ -1420,25 +1578,17 @@ const ColorReflex = (() => {
   const results = document.getElementById('colorResults');
 
   function generateRound() {
-    // Pick word and ink color - ensure they're different (Stroop effect)
     const wordIdx = Math.floor(Math.random() * COLORS.length);
     let inkIdx;
     do { inkIdx = Math.floor(Math.random() * COLORS.length); } while (inkIdx === wordIdx && Math.random() < 0.7);
     currentWord = COLORS[wordIdx].name;
     inkColor = COLORS[inkIdx].hex;
-
     const wordEl = document.getElementById('colorWordDisplay');
-    if (wordEl) {
-      wordEl.textContent = currentWord;
-      wordEl.style.color = inkColor;
-    }
-
-    // Build 4 option buttons (always include correct answer)
+    if (wordEl) { wordEl.textContent = currentWord; wordEl.style.color = inkColor; }
     const correctColor = COLORS.find(c => c.name === currentWord);
     const others = COLORS.filter(c => c.name !== currentWord);
     const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
     const options = [...shuffled, correctColor].sort(() => Math.random() - 0.5);
-
     const btns = document.getElementById('colorButtons');
     if (btns) {
       btns.innerHTML = options.map(c =>
@@ -1452,24 +1602,16 @@ const ColorReflex = (() => {
     if (!btn || !running) return;
     const chosen = btn.dataset.color;
     if (chosen === currentWord) {
-      // Correct
-      correct++;
-      streak++;
+      correct++; streak++;
       if (streak > bestStreak) bestStreak = streak;
       score += 1 + Math.floor(streak / 3);
       btn.classList.add('color-btn-correct');
       setEl('colorScore', score); setEl('colorStreak', streak); setEl('colorBestStreak', bestStreak);
       setTimeout(() => generateRound(), 150);
     } else {
-      // Wrong
-      wrong++;
-      streak = 0;
-      score = Math.max(0, score - 1);
+      wrong++; streak = 0; score = Math.max(0, score - 1);
       btn.classList.add('color-btn-wrong');
-      // Flash correct
-      document.querySelectorAll('.color-btn').forEach(b => {
-        if (b.dataset.color === currentWord) b.classList.add('color-btn-correct');
-      });
+      document.querySelectorAll('.color-btn').forEach(b => { if (b.dataset.color === currentWord) b.classList.add('color-btn-correct'); });
       setEl('colorScore', score); setEl('colorStreak', streak);
       setTimeout(() => generateRound(), 400);
     }
@@ -1498,7 +1640,7 @@ const ColorReflex = (() => {
     const xpEarned = score >= 25 ? 50 : score >= 18 ? 35 : score >= 12 ? 25 : score >= 6 ? 15 : 10;
     XPSystem.addXP(xpEarned); showToast(`+${xpEarned} XP earned!`, 'success');
     setupShare('colorShare', 'colorShareBox', 'colorShareText', 'colorCopyBtn',
-      `🎨 I scored ${score} in Color Reflex on ReflexZone! (${correct} correct, best streak ${bestStreak}) reflexzone.io`);
+      `🎨 I scored ${score} in Color Reflex on StatDungeon! (${correct} correct, best streak ${bestStreak}) statdungeon.io`);
     document.getElementById('colorRetry').onclick = () => {
       results.classList.add('hidden');
       document.getElementById('colorStartOverlay')?.classList.remove('hidden');
@@ -1509,9 +1651,7 @@ const ColorReflex = (() => {
   function init() {
     document.getElementById('colorStartBtn')?.addEventListener('click', startGame);
     document.getElementById('colorButtons')?.addEventListener('click', handleAnswer);
-    document.getElementById('colorArena')?.addEventListener('click', (e) => {
-      if (running) handleAnswer(e);
-    });
+    document.getElementById('colorArena')?.addEventListener('click', (e) => { if (running) handleAnswer(e); });
   }
 
   return { init };
@@ -1532,16 +1672,13 @@ function refreshDashboard() {
     const best = Storage.get(test + '_best', null);
     const unit = units[test] || '';
     const prefix = prefixes[test] || '';
-
     const bestEl = document.getElementById('dash' + capitalize(test) + 'Best');
     if (bestEl) bestEl.textContent = best !== null ? prefix + best + unit : '—';
-
     const avgEl = document.getElementById('dash' + capitalize(test) + 'Avg');
     if (avgEl && hist.length > 0) {
       const avg = hist.reduce((a, b) => a + b.score, 0) / hist.length;
       avgEl.textContent = 'Avg: ' + prefix + (test === 'reaction' ? Math.round(avg) : avg.toFixed(1)) + unit;
     }
-
     const histEl = document.getElementById('dash' + capitalize(test) + 'History');
     if (histEl && hist.length > 0) {
       const scores = hist.map(h => h.score);
@@ -1580,6 +1717,7 @@ document.getElementById('resetAllData')?.addEventListener('click', () => {
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  DungeonCanvas.init();
   StreakSystem.check();
   updateHUD();
   updateHomeBests();
@@ -1598,5 +1736,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') navigateTo('home');
   });
 
-  console.log('%c⚡ ReflexZone v2 loaded', 'color: #00ffaa; font-size: 16px; font-weight: bold;');
+  console.log('%c⚔️ StatDungeon v1 loaded', 'color: #c8a020; font-size: 16px; font-weight: bold;');
 });

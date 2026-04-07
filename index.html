@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ReflexZone — Human Benchmark & Training Platform</title>
-  <meta name="description" content="Test and train your reaction time, aim, memory, typing speed, and CPS. Track your progress and compete with gamers worldwide." />
+  <title>StatDungeon — Human Stat Testing Platform</title>
+  <meta name="description" content="Test and train your reaction time, aim, memory, typing speed, and CPS. Track your progress and compete with players worldwide." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600&family=MedievalSharp&family=UnifrakturMaguntia&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- ===== DUNGEON TILE BACKGROUND ===== -->
+  <canvas id="dungeonCanvas" class="dungeon-bg-canvas"></canvas>
 
   <!-- ===== THEME SWITCHER ===== -->
   <div class="theme-bar">
@@ -21,19 +24,15 @@
     <button class="theme-btn" data-theme="fire" title="Fire Orange">🔥</button>
     <button class="theme-btn" data-theme="void" title="Void Purple">🌙</button>
     <button class="theme-btn" data-theme="light" title="Light Mode">☀️</button>
-  </div>
-
-  <!-- AD PLACEHOLDER: Top Banner -->
-  <div class="ad-banner ad-top" aria-label="Advertisement">
-    <span>AD SPACE — 728×90 LEADERBOARD</span>
+    <button class="theme-btn" data-theme="dungeon" title="Dungeon">🏰</button>
   </div>
 
   <!-- ===== NAVIGATION ===== -->
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="#home" class="nav-logo" data-nav="home">
-        <span class="logo-icon">⚡</span>
-        <span class="logo-text">REFLEX<span class="logo-accent">ZONE</span></span>
+        <span class="logo-icon">⚔️</span>
+        <span class="logo-text">STAT<span class="logo-accent">DUNGEON</span></span>
       </a>
       <div class="nav-links">
         <a href="#reaction-time" class="nav-link" data-nav="reaction">Reaction</a>
@@ -79,12 +78,12 @@
         <div class="glow-orb orb-3"></div>
       </div>
       <div class="home-content">
-        <div class="home-badge">HUMAN BENCHMARK PLATFORM</div>
+        <div class="home-badge">HUMAN STAT TESTING PLATFORM</div>
         <h1 class="home-title">
           TEST YOUR<br/>
-          <span class="title-accent">REFLEXES</span>
+          <span class="title-accent">STATS</span>
         </h1>
-        <p class="home-subtitle">Train reaction time, aim, memory, typing, and more. Earn XP, level up, and dominate the leaderboard.</p>
+        <p class="home-subtitle">Train reaction time, aim, memory, typing, and more. Earn XP, level up, and master every stat.</p>
 
         <!-- Player HUD -->
         <div class="player-hud">
@@ -467,7 +466,7 @@
       </div>
     </section>
 
-    <!-- ===== NUMBER MEMORY (NEW) ===== -->
+    <!-- ===== NUMBER MEMORY ===== -->
     <section id="number-memory" class="section" aria-label="Number Memory Test">
       <div class="section-header">
         <div class="sec-back" data-nav="home">← Back</div>
@@ -522,7 +521,7 @@
       </div>
     </section>
 
-    <!-- ===== CHIMP TEST (NEW) ===== -->
+    <!-- ===== CHIMP TEST ===== -->
     <section id="chimp-test" class="section" aria-label="Chimp Test">
       <div class="section-header">
         <div class="sec-back" data-nav="home">← Back</div>
@@ -570,7 +569,7 @@
       </div>
     </section>
 
-    <!-- ===== COLOR REFLEX (NEW) ===== -->
+    <!-- ===== COLOR REFLEX ===== -->
     <section id="color-reflex" class="section" aria-label="Color Reflex Test">
       <div class="section-header">
         <div class="sec-back" data-nav="home">← Back</div>
@@ -738,12 +737,8 @@
     </div>
   </div>
 
-  <div class="ad-banner ad-bottom" aria-label="Advertisement">
-    <span>AD SPACE — 728×90 LEADERBOARD</span>
-  </div>
-
   <footer class="site-footer">
-    <p>⚡ ReflexZone — Human Benchmark & Training Platform</p>
+    <p>⚔️ StatDungeon — Human Stat Testing Platform</p>
     <p><small>All tests run locally in your browser. No data sent to any server.</small></p>
   </footer>
 
